@@ -18,9 +18,13 @@ namespace TrainTicket.API.Controllers
 
         public FileManager FileManager = new FileManager();
 
+        /// <summary>
+        /// create the json file and first user with ticket history if one does not exist
+        /// </summary>
+        /// <param name="ticket"></param>
         [HttpGet]
         [Route("")]
-        public void Initialize()
+        public void Initialize(Ticket ticket)
         {
             if (!File.Exists("User.json"))
             {
@@ -28,21 +32,25 @@ namespace TrainTicket.API.Controllers
                 {
                     UserId = 1,
                     Name = "Genny",
-                    TicketHistory = new List<Ticket>()
+                    TicketHistory = new List<Ticket>() { ticket}
 
                 };
 
                 userList.Add(user);
-                //from List => JsonFile
                 string userJsonInput = JsonConvert.SerializeObject(userList);
                 FileManager.WriteAllText("User.json", userJsonInput);
             }
 
         }
-
+        /// <summary>
+        /// aads a new user if user does not exist
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="ticket"></param>
+        /// <returns>user ID</returns>
         [HttpPost]
-        [Route("adduser")]
-        public void AddNewUser(string name, out int userId)
+        [Route("adduser/{name}")]
+        public int AddNewUser(string name)
         {
             string userFromJson = FileManager.ReadAllText("User.json");
             List<User> userlistTemp = JsonConvert.DeserializeObject<List<User>>(userFromJson);
@@ -54,84 +62,39 @@ namespace TrainTicket.API.Controllers
                 Name = name,
                 TicketHistory = new List<Ticket>()
             };
-            userId = user.UserId;
+            int userId = user.UserId;
             userlistTemp.Add(user);
 
             //add to jsonFile
             string userJsonInput = JsonConvert.SerializeObject(userlistTemp);
             FileManager.WriteAllText("User.json", userJsonInput);
+
+            return userId;
         }
 
+        /// <summary>
+        /// gets detail of selected user and all of users train history 
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns>user details with complete train history</returns>
         [HttpGet]
         [Route("getcurrentdetails/{userId}")]
-        public void GetSelectedUserFinalDetail(int userId)
+        public User GetSelectedUserFinalDetail(int userId)
         {
             //detail for that selected train only
             string userFromJson = FileManager.ReadAllText("User.json");
             List<User> userlistTemp = JsonConvert.DeserializeObject<List<User>>(userFromJson);
 
             var Useritem = userlistTemp.First(x => x.UserId == userId);
-            if (Useritem != null)
-            {
-                Console.WriteLine("ID: " + Useritem.UserId);
-                Console.WriteLine("Name: " + Useritem.Name);
-
-                //choose which history to display
-                int counter = Useritem.TicketHistory.Count; //choosing the last item in history
-
-                //foreach ticket = print ticket history
-                foreach (var ticketHistoryItem in Useritem.TicketHistory)
-                {
-                    if (ticketHistoryItem.TicketId == counter)
-                    {
-                        Console.WriteLine("Booking Time: " + ticketHistoryItem.BookingTime);
-                        Console.WriteLine("Origin Station: " + ticketHistoryItem.SelectedTrain.StartDestination);
-                        Console.WriteLine("End Station: " + ticketHistoryItem.SelectedTrain.EndDestination);
-                        Console.WriteLine("Departure Time: " + ticketHistoryItem.SelectedTrain.DepartureTime.ToShortTimeString());
-                        Console.WriteLine("Arrival Time: " + ticketHistoryItem.SelectedTrain.ArrivalTime.ToShortTimeString());
-                        Console.WriteLine("Number of tickets: " + ticketHistoryItem.NumOfTickets);
-                        Console.WriteLine("Travel Class: " + ticketHistoryItem.SelectedClass);
-
-                    }
-
-                }
-
-            }
+            return Useritem;
 
         }
 
-        [HttpGet]
-        [Route("getalldetails/{userId}")]
-        public void GetSelectedUserAllDetails(int userId)
-        {
-            //detail for all trains purchased
-            string userFromJson = FileManager.ReadAllText("User.json");
-            List<User> userlistTemp = JsonConvert.DeserializeObject<List<User>>(userFromJson);
-
-            var Useritem = userlistTemp.First(x => x.UserId == userId);
-            if (Useritem != null)
-            {
-                Console.WriteLine("ID: " + Useritem.UserId);
-                Console.WriteLine("Name: " + Useritem.Name);
-
-                //foreach ticket = print ticket history
-                foreach (var ticketHistoryItem in Useritem.TicketHistory)
-                {
-                    Console.WriteLine("Ticket Id: " + ticketHistoryItem.TicketId);
-                    Console.WriteLine("Booking Time: " + ticketHistoryItem.BookingTime);
-                    Console.WriteLine("Origin Station: " + ticketHistoryItem.SelectedTrain.StartDestination);
-                    Console.WriteLine("End Station: " + ticketHistoryItem.SelectedTrain.EndDestination);
-                    Console.WriteLine("Departure Time: " + ticketHistoryItem.SelectedTrain.DepartureTime.ToShortTimeString());
-                    Console.WriteLine("Arrival Time: " + ticketHistoryItem.SelectedTrain.ArrivalTime.ToShortTimeString());
-                    Console.WriteLine("Number of tickets: " + ticketHistoryItem.NumOfTickets);
-                    Console.WriteLine("Travel Class: " + ticketHistoryItem.SelectedClass);
-                    Console.WriteLine("-------------------------------------");
-                }
-
-            }
-
-        }
-
+        /// <summary>
+        /// checks if user exist in file
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns>bool value</returns>
         [HttpGet]
         [Route("checkexist/{userId}")]
         public bool CheckUserExist(int userId)
