@@ -13,14 +13,17 @@ namespace TrainTicket.API.Controllers
     public class TicketController : ApiController
     {
         public delegate void TransactionAlert(double totalCost);
+
         public class TicketManager
         {
             FileManager FileManager = new FileManager();
 
             public event TransactionAlert TransactionComplete;
+
+            [HttpPut]
+            //not changed into 'put' yet
             public void BuyTicket(int userId, Train selectedTrain, TrainClassEnum selectedClass, int numofTickets)
             {
-
                 string userFromJson = FileManager.ReadAllText("User.json");
                 List<User> userlistTemp = JsonConvert.DeserializeObject<List<User>>(userFromJson);
                 foreach (User item in userlistTemp)
@@ -57,13 +60,18 @@ namespace TrainTicket.API.Controllers
 
             }
 
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="userId"></param>
+            /// <returns>final cost based on chosen route, class and num of tickets</returns>
             [HttpGet]
             [Route("finalcost")]
-            public void GrandTotal(int userId, out double finalCost)
+            public double GrandTotal(int userId)
             {
                 string userFromJson = FileManager.ReadAllText("User.json");
                 List<User> userlistTemp = JsonConvert.DeserializeObject<List<User>>(userFromJson);
-                finalCost = 0;
+                double finalCost = 0;
 
                 foreach (User userItem in userlistTemp)
                 {
@@ -94,7 +102,6 @@ namespace TrainTicket.API.Controllers
                                     price = itemInTicketHist.SelectedTrain.EconomyClassFare;
                                 }
                             }
-
                         }
 
                         finalCost = quantity * price;
@@ -107,6 +114,7 @@ namespace TrainTicket.API.Controllers
                     }
 
                 }
+                return finalCost;
 
             }
         }

@@ -17,14 +17,19 @@ namespace TrainTicket.API.Controllers
         public FileManager FileManager = new FileManager();
         private List<Train> _trainlistJson;
         IAppConfiguration _config;
-        public TrainController(IAppConfiguration config)        //interface boxing; allow for mocking
+        public TrainController()      //interface boxing; allow for mocking
         {
-            _config = config;
+            _config = new AppConfiguration();
+            _config.Initialize(300, 250, 150, 3.5, 2.5, 1.5);
         }
 
+        /// <summary>
+        /// creates the train list and add to json file
+        /// </summary>
+        /// <returns>list of available trains</returns>
         [HttpPost]
         [Route("addtrain")]
-        public void CreateTrainList()
+        public List<Train> CreateTrainList()
         {
             Train train1 = new Train()
             {
@@ -143,8 +148,14 @@ namespace TrainTicket.API.Controllers
             string trainListJson = JsonConvert.SerializeObject(AvailableTrainList);
             FileManager.WriteAllText("TrainList.json", trainListJson);
 
+            return AvailableTrainList;
         }
 
+        /// <summary>
+        /// calls the createTrain method if there is no train.json file
+        /// calls the config to calculate the train fares for all classess and routes
+        /// </summary>
+        [HttpGet]
         [Route("")]
         public void Initialize()
         {
@@ -162,10 +173,17 @@ namespace TrainTicket.API.Controllers
             }
         }
 
+        /// <summary>
+        /// gets a list of start stations
+        /// </summary>
+        /// <returns>a list of start stations</returns>
         [HttpGet]
         [Route("getstart")]
         public List<string> GetAllStartStations()
         {
+            string trainFromJson = FileManager.ReadAllText("TrainList.json");
+            _trainlistJson = JsonConvert.DeserializeObject<List<Train>>(trainFromJson);
+
             List<string> startStationList = new List<string>();
             foreach (Train train in _trainlistJson)
             {
@@ -178,10 +196,17 @@ namespace TrainTicket.API.Controllers
             return startStationList;
         }
 
+        /// <summary>
+        /// gets a list of end stations
+        /// </summary>
+        /// <returns>a list of end stations</returns>
         [HttpGet]
         [Route("getend")]
         public List<string> GetAllEndStations()
         {
+            string trainFromJson = FileManager.ReadAllText("TrainList.json");
+            _trainlistJson = JsonConvert.DeserializeObject<List<Train>>(trainFromJson);
+
             List<string> endStationList = new List<string>();
             foreach (Train train in _trainlistJson)
             {
@@ -194,14 +219,24 @@ namespace TrainTicket.API.Controllers
             return endStationList;
         }
 
+        /// <summary>
+        /// gets a list of availabe trains and thier timings based on selected start and end desitination
+        /// </summary>
+        /// <param name="start">start station as chosen by user</param>
+        /// <param name="end">end station as chosen by user</param>
+        /// <returns>list of available routes between the chossen stations</returns>
         [HttpGet]
         [Route("getbetween")]
         public List<Train> GetTrainsBetweenStations(string start, string end)
         {
+            string trainFromJson = FileManager.ReadAllText("TrainList.json");
+            _trainlistJson = JsonConvert.DeserializeObject<List<Train>>(trainFromJson);
+
             return _trainlistJson.Where(x => string.Equals(x.EndDestination, end, StringComparison.OrdinalIgnoreCase)
             && string.Equals(x.StartDestination, start, StringComparison.OrdinalIgnoreCase)).ToList();
         }
 
+        //not needed??
         [HttpGet]
         [Route("getclass")]
         public List<string> GetTrainClass()
