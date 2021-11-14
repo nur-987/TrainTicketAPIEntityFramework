@@ -49,7 +49,7 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
             {
                 var readTask = result.Content.ReadAsStringAsync();
                 readTask.Wait();
-                userId = Int32.Parse(readTask.Result);  
+                userId = Int32.Parse(readTask.Result);
             }
 
             return userId;
@@ -65,13 +65,48 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
                 var readTask = result.Content.ReadAsStringAsync();
                 readTask.Wait();
                 string response = readTask.Result;
-                if (string.Equals(response,"true"))
+                if (string.Equals(response, "true"))
                 {
                     return true;
                 }
 
             }
             return false;
+        }
+
+        public User GetSelectedUserDetail(int userId)
+        {
+            //all the train history
+            var responseTask = _trainticketClient.GetAsync("api/user/getdetails/" + userId);
+            responseTask.Wait();
+            var result = responseTask.Result;
+            if (result.IsSuccessStatusCode)
+            {
+                var readTask = result.Content.ReadAsAsync<User>();
+                readTask.Wait();
+                return readTask.Result;
+            }
+
+            return null;
+
+        }
+
+        public Ticket GetSelectedUserDetailSpecific(int userId)
+        {
+            //only current train history (no user)
+            var responseTask = _trainticketClient.GetAsync("api/user/getdetails/" + userId);
+            responseTask.Wait();
+            var result = responseTask.Result;
+            if (result.IsSuccessStatusCode)
+            {
+                var readTask = result.Content.ReadAsAsync<User>();
+                readTask.Wait();
+                Ticket specificTrainDetail = readTask.Result.TicketHistory.LastOrDefault();
+                return specificTrainDetail;
+            }
+
+            return null;
+
         }
 
         public List<string> GetAllStartStations()
@@ -81,7 +116,7 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
             var result = responseTask.Result;
             if (result.IsSuccessStatusCode)
             {
-                var readTask = result.Content.ReadAsAsync<List<string>>(); 
+                var readTask = result.Content.ReadAsAsync<List<string>>();
                 readTask.Wait();
                 return readTask.Result;
             }
@@ -104,23 +139,47 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
 
         public List<Train> GetTrainsBetweenStations(string start, string end)
         {
-            var responseTask = _trainticketClient.GetAsync("api/train/getbetween?start=" +start+"&end=" +end);
+            var responseTask = _trainticketClient.GetAsync("api/train/getbetween?start=" + start + "&end=" + end);
             responseTask.Wait();
             var result = responseTask.Result;
             if (result.IsSuccessStatusCode)
             {
-                var readTask = result.Content.ReadAsAsync<List<Train>>();         
+                var readTask = result.Content.ReadAsAsync<List<Train>>();
                 readTask.Wait();
                 return readTask.Result;
             }
             return null;
         }
 
-        public void BuyTicket(int userId, Train selectedTrain, TrainClassEnum selectedClass, int numofTickets)
+        public User BuyTicket(int userId, int numofTickets, Train selectedTrain, TrainClassEnum selectedClass)
         {
+            var responseTask = _trainticketClient.GetAsync("api/ticket/buy?userId=" + userId + "&numofTickets=" + numofTickets);
+            responseTask.Wait();
+            var result = responseTask.Result;
+            if (result.IsSuccessStatusCode)
+            {
+                var readTask = result.Content.ReadAsAsync<User>();
+                readTask.Wait();
+                return readTask.Result;
+            }
+
+            return null;
 
         }
 
+        public string GrandTotal(int userId)
+        {
+            var responseTask = _trainticketClient.GetAsync("api/ticket/finalcost/"+ userId);
+            responseTask.Wait();
+            var result = responseTask.Result;
+            if (result.IsSuccessStatusCode)
+            {
+                var readTask = result.Content.ReadAsStringAsync();
+                readTask.Wait();
+                return readTask.Result;
+            }
 
+            return null;
+        }
     }
 }

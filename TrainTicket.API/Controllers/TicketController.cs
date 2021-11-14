@@ -10,113 +10,77 @@ using TrainTicket.API.Utility;
 
 namespace TrainTicket.API.Controllers
 {
+    [RoutePrefix("api/ticket")]
     public class TicketController : ApiController
     {
-        public delegate void TransactionAlert(double totalCost);
+        FileManager FileManager = new FileManager();
 
-        public class TicketManager
+        [HttpPatch]
+        [Route("buy")]
+        public User BuyTicket(int userId, int numofTickets, Train selectedTrain, TrainClassEnum selectedClass)
         {
-            FileManager FileManager = new FileManager();
+            string userFromJson = FileManager.ReadAllText("User.json");
+            List<User> userlistTemp = JsonConvert.DeserializeObject<List<User>>(userFromJson);
 
-            public event TransactionAlert TransactionComplete;
-
-            [HttpPut]
-            //not changed into 'put' yet
-            public void BuyTicket(int userId, Train selectedTrain, TrainClassEnum selectedClass, int numofTickets)
+            var currentUser = userlistTemp.Where(x => x.UserId == userId).FirstOrDefault();
+            if (currentUser == null)
             {
-                string userFromJson = FileManager.ReadAllText("User.json");
-                List<User> userlistTemp = JsonConvert.DeserializeObject<List<User>>(userFromJson);
-                foreach (User item in userlistTemp)
-                {
-                    int idCount = item.TicketHistory.Count;
-                    if (item.UserId == userId)
-                    {
-                        try
-                        {
-                            item.TicketHistory.Add(new Ticket()
-                            {
-                                TicketId = ++idCount,
-                                BookingTime = DateTime.Now,
-                                SelectedClass = selectedClass,
-                                SelectedTrain = selectedTrain,
-                                NumOfTickets = numofTickets
-                            });
-
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine("Unable to add train to purchase");
-                        }
-                        finally
-                        {
-                            //updates the ticket bought
-                            //update the json file
-                            var updatedString = JsonConvert.SerializeObject(userlistTemp, Formatting.Indented);
-                            FileManager.WriteAllText("User.json", updatedString);
-                        }
-
-                    }
-                }
-
+                return null;
             }
 
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="userId"></param>
-            /// <returns>final cost based on chosen route, class and num of tickets</returns>
-            [HttpGet]
-            [Route("finalcost")]
-            public double GrandTotal(int userId)
+            int idCount = currentUser.TicketHistory.Count();
+
+            userlistTemp.Remove(currentUser);
+            currentUser.TicketHistory.Add(new Ticket()
             {
-                string userFromJson = FileManager.ReadAllText("User.json");
-                List<User> userlistTemp = JsonConvert.DeserializeObject<List<User>>(userFromJson);
-                double finalCost = 0;
+                TicketId = ++idCount,
+                BookingTime = DateTime.Now,
+                SelectedClass = selectedClass,
+                SelectedTrain = selectedTrain,
+                NumOfTickets = numofTickets
+            });
 
-                foreach (User userItem in userlistTemp)
-                {
-                    //choose which history to display
-                    int counter = userItem.TicketHistory.Count;
+            var updatedString = JsonConvert.SerializeObject(userlistTemp, Formatting.Indented);
+            FileManager.WriteAllText("User.json", updatedString);
 
-                    if (userItem.UserId == userId && userItem.TicketHistory != null)
-                    {
-                        int quantity = 0;
-                        double price = 0;
-
-                        foreach (var itemInTicketHist in userItem.TicketHistory)
-                        {
-                            if (itemInTicketHist.TicketId == counter)
-                            {
-                                quantity = itemInTicketHist.NumOfTickets;
-
-                                if (itemInTicketHist.SelectedClass == TrainClassEnum.FirstClass)
-                                {
-                                    price = itemInTicketHist.SelectedTrain.FirstClassFare;
-                                }
-                                else if (itemInTicketHist.SelectedClass == TrainClassEnum.BusinessClass)
-                                {
-                                    price = itemInTicketHist.SelectedTrain.BusinessClassFare;
-                                }
-                                else if (itemInTicketHist.SelectedClass == TrainClassEnum.Economy)
-                                {
-                                    price = itemInTicketHist.SelectedTrain.EconomyClassFare;
-                                }
-                            }
-                        }
-
-                        finalCost = quantity * price;
-
-                        if (TransactionComplete != null)
-                        {
-                            TransactionComplete.Invoke(finalCost);
-                        }
-
-                    }
-
-                }
-                return finalCost;
-
-            }
+            return currentUser;
         }
+            
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns>final cost based on chosen route, class and num of tickets</returns>
+        [HttpGet]
+        [Route("finalcost/{userId}")]
+        public double GrandTotal(int userId)
+        {
+            string userFromJson = FileManager.ReadAllText("User.json");
+            List<User> userlistTemp = JsonConvert.DeserializeObject<List<User>>(userFromJson);
+            double finalCost = 0;
+            double price = 0;
+
+            var currentUser = userlistTemp.Where(x => x.UserId == userId).FirstOrDefault();
+            var ticketHistory = currentUser.TicketHistory.Last();
+
+
+            if (ticketHistory.SelectedClass == TrainClassEnum.FirstClass)
+            {
+                price = ticketHistory.SelectedTrain.FirstClassFare;
+            }
+            else if (ticketHistory.SelectedClass == TrainClassEnum.BusinessClass)
+            {
+                price = ticketHistory.SelectedTrain.BusinessClassFare;
+            }
+            else if (ticketHistory.SelectedClass == TrainClassEnum.Economy)
+            {
+                price = ticketHistory.SelectedTrain.EconomyClassFare;
+            }
+
+            return finalCost = price * ticketHistory.NumOfTickets;
+
+        }
+
     }
 }

@@ -236,19 +236,5 @@ namespace TrainTicket.API.Controllers
             && string.Equals(x.StartDestination, start, StringComparison.OrdinalIgnoreCase)).ToList();
         }
 
-        //not needed??
-        [HttpGet]
-        [Route("getclass")]
-        public List<string> GetTrainClass()
-        {
-            List<string> trainClassList = new List<string>();
-            foreach (string trainClass in Enum.GetNames(typeof(TrainClassEnum)))
-            {
-                trainClassList.Add(trainClass);
-            }
-
-            return trainClassList;
-        }
-
     }
 }

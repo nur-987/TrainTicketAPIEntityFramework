@@ -152,6 +152,7 @@ namespace TrainTicketAPIEntityFrmk
                         try
                         {
                             temptrainId = Int32.Parse(Console.ReadLine());
+                            //change this to a method?
                             trainSelected = availableTrainRoutesList.First(x => x.TrainId == temptrainId);
 
                             //display class options and their cost.
@@ -190,7 +191,7 @@ namespace TrainTicketAPIEntityFrmk
                             Console.WriteLine("Enter the total number of tickets to purchase:");
                             tempNumofTicket = Int32.Parse(Console.ReadLine());
 
-                            trainvm.BuyTicket(userId, trainSelected, selectedClass, tempNumofTicket);
+                            trainvm.BuyTicket(userId, tempNumofTicket, trainSelected, selectedClass);
                             travelClassSelectionFlag = false;
 
                         }
@@ -205,15 +206,11 @@ namespace TrainTicketAPIEntityFrmk
                     bool finalConfirmation = true;
                     while (finalConfirmation)
                     {
-                        //subscribes to event
-                        //ask user to make payment after completed booking
-                        ticketManager.TransactionComplete += Calculation_TransactionComplete;
-
 
                         Console.WriteLine("Here are your booking details.");
-                        user.GetSelectedUserFinalDetail(userId);
+                        trainvm.GetSelectedUserDetailSpecific(userId);
 
-                        ticketManager.GrandTotal(userId);
+                        trainvm.GrandTotal(userId);
                         finalConfirmation = false;
 
                     }
@@ -236,7 +233,7 @@ namespace TrainTicketAPIEntityFrmk
                             userId = Int32.Parse(Console.ReadLine());
                             if (trainvm.CheckUserExist(userId))
                             {
-                                trainvm.GetSelectedUserAllDetails(userId);
+                                trainvm.GetSelectedUserDetail(userId);
                                 userDetailsFlag = false;
                             }
                             else

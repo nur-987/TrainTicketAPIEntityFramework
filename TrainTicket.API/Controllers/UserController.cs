@@ -78,10 +78,9 @@ namespace TrainTicket.API.Controllers
         /// <param name="userId"></param>
         /// <returns>user details with complete train history</returns>
         [HttpGet]
-        [Route("getcurrentdetails/{userId}")]
-        public User GetSelectedUserFinalDetail(int userId)
+        [Route("getdetails/{userId}")]
+        public User GetSelectedUserDetail(int userId)
         {
-            //detail for that selected train only
             string userFromJson = FileManager.ReadAllText("User.json");
             List<User> userlistTemp = JsonConvert.DeserializeObject<List<User>>(userFromJson);
 
