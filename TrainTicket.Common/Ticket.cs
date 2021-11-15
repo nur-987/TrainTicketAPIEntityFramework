@@ -14,5 +14,6 @@ namespace TrainTicket.Common
         public DateTime BookingTime { get; set; }
         public int NumOfTickets { get; set; }
 
+        public double GrandTotal { get; set; }
     }
 }

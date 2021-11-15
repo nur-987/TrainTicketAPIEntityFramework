@@ -13,5 +13,6 @@ namespace TrainTicket.API.Models
         public TrainClassEnum SelectedClass { get; set; }
         public DateTime BookingTime { get; set; }
         public int NumOfTickets { get; set; }
+        public double GrandTotal { get; set; }
     }
 }

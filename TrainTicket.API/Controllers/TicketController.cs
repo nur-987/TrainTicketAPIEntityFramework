@@ -52,7 +52,7 @@ namespace TrainTicket.API.Controllers
         /// </summary>
         /// <param name="userId"></param>
         /// <returns>final cost based on chosen route, class and num of tickets</returns>
-        [HttpGet]
+        [HttpPatch]
         [Route("finalcost/{userId}")]
         public double GrandTotal(int userId)
         {
@@ -78,7 +78,9 @@ namespace TrainTicket.API.Controllers
                 price = ticketHistory.SelectedTrain.EconomyClassFare;
             }
 
-            return finalCost = price * ticketHistory.NumOfTickets;
+            finalCost = price * ticketHistory.NumOfTickets;
+            ticketHistory.GrandTotal = finalCost;
+            return finalCost;
 
         }
 

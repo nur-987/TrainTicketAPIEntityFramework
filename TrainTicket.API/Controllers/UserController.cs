@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using TrainTicket.API.Data;
 using TrainTicket.API.Models;
 using TrainTicket.API.Utility;
 
@@ -17,6 +18,8 @@ namespace TrainTicket.API.Controllers
         public List<User> userList = new List<User>();
 
         public FileManager FileManager = new FileManager();
+
+        TrainTicketDataContext dbContext = new TrainTicketDataContext();
 
         /// <summary>
         /// create the json file and first user with ticket history if one does not exist
