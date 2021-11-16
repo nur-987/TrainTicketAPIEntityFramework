@@ -1,9 +1,9 @@
-﻿namespace TrainTicket.API.Migrations
+namespace TrainTicket.API.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class initialToSql : DbMigration
+    public partial class v1 : DbMigration
     {
         public override void Up()
         {
@@ -16,14 +16,14 @@
                         BookingTime = c.DateTime(nullable: false),
                         NumOfTickets = c.Int(nullable: false),
                         GrandTotal = c.Double(nullable: false),
+                        UserId = c.Int(nullable: false),
                         SelectedTrain_TrainId = c.Int(),
-                        User_UserId = c.Int(),
                     })
                 .PrimaryKey(t => t.TicketId)
                 .ForeignKey("dbo.Trains", t => t.SelectedTrain_TrainId)
-                .ForeignKey("dbo.Users", t => t.User_UserId)
-                .Index(t => t.SelectedTrain_TrainId)
-                .Index(t => t.User_UserId);
+                .ForeignKey("dbo.Users", t => t.UserId, cascadeDelete: true)
+                .Index(t => t.UserId)
+                .Index(t => t.SelectedTrain_TrainId);
             
             CreateTable(
                 "dbo.Trains",
@@ -54,10 +54,10 @@
         
         public override void Down()
         {
-            DropForeignKey("dbo.Tickets", "User_UserId", "dbo.Users");
+            DropForeignKey("dbo.Tickets", "UserId", "dbo.Users");
             DropForeignKey("dbo.Tickets", "SelectedTrain_TrainId", "dbo.Trains");
-            DropIndex("dbo.Tickets", new[] { "User_UserId" });
             DropIndex("dbo.Tickets", new[] { "SelectedTrain_TrainId" });
+            DropIndex("dbo.Tickets", new[] { "UserId" });
             DropTable("dbo.Users");
             DropTable("dbo.Trains");
             DropTable("dbo.Tickets");

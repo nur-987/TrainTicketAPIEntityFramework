@@ -1,11 +1,13 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity.Infrastructure;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Description;
 using TrainTicket.API.Data;
 using TrainTicket.API.Models;
 using TrainTicket.API.Utility;
@@ -19,76 +21,73 @@ namespace TrainTicket.API.Controllers
 
         public FileManager FileManager = new FileManager();
 
-        TrainTicketDataContext dbContext = new TrainTicketDataContext();
+        TrainTicketDataContext dbContext;
 
-        /// <summary>
-        /// create the json file and first user with ticket history if one does not exist
-        /// </summary>
-        /// <param name="ticket"></param>
-        [HttpGet]
-        [Route("")]
-        public void Initialize(Ticket ticket)
+        public UserController()
         {
-            if (!File.Exists("User.json"))
-            {
-                User user = new User()
-                {
-                    UserId = 1,
-                    Name = "Genny",
-                    TicketHistory = new List<Ticket>() { ticket}
-
-                };
-
-                userList.Add(user);
-                string userJsonInput = JsonConvert.SerializeObject(userList);
-                FileManager.WriteAllText("User.json", userJsonInput);
-            }
-
+            dbContext = new TrainTicketDataContext();
         }
+
         /// <summary>
-        /// aads a new user if user does not exist
+        /// gets a list of all users in DB
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("")]     //checked in postman
+        public List<User> GetAllUser()
+        {
+            return dbContext.User.ToList();
+        }
+
+        /// <summary>
+        /// adds a new user if user does not exist
         /// </summary>
         /// <param name="name"></param>
-        /// <param name="ticket"></param>
         /// <returns>user ID</returns>
         [HttpPost]
-        [Route("adduser/{name}")]
-        public int AddNewUser(string name)
-        {
-            string userFromJson = FileManager.ReadAllText("User.json");
-            List<User> userlistTemp = JsonConvert.DeserializeObject<List<User>>(userFromJson);
-
-            int num = userlistTemp.Count();
-            User user = new User()
+        [Route("adduser/{name}")]       //checked in postman
+        [ResponseType(typeof(User))]
+        public IHttpActionResult AddNewUser(string name)
+        { 
+            User user1 = new User()
             {
-                UserId = num + 1,
-                Name = name,
-                TicketHistory = new List<Ticket>()
+                //ID is auto
+                Name = name
+
             };
-            int userId = user.UserId;
-            userlistTemp.Add(user);
 
-            //add to jsonFile
-            string userJsonInput = JsonConvert.SerializeObject(userlistTemp);
-            FileManager.WriteAllText("User.json", userJsonInput);
+            dbContext.User.Add(user1);
+            dbContext.SaveChanges();
+            
+            return Ok(user1.UserId);
 
-            return userId;
         }
 
         /// <summary>
-        /// gets detail of selected user and all of users train history 
+        /// gets detail of selected user's LATEST train history 
         /// </summary>
         /// <param name="userId"></param>
         /// <returns>user details with complete train history</returns>
         [HttpGet]
-        [Route("getdetails/{userId}")]
-        public User GetSelectedUserDetail(int userId)
+        [Route("getdetails/{userId}")]      //checked in postman
+        public Ticket GetSelectedUserDetail(int userId)
         {
-            string userFromJson = FileManager.ReadAllText("User.json");
-            List<User> userlistTemp = JsonConvert.DeserializeObject<List<User>>(userFromJson);
+           Ticket ticket = dbContext.Ticket.Where(t => t.User.UserId == userId).LastOrDefault();
+           return ticket;
 
-            var Useritem = userlistTemp.First(x => x.UserId == userId);
-            return Useritem;
+        }
+
+        /// <summary>
+        /// gets detail of selected user's ALL train history 
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns>user details with complete train history</returns>
+        [HttpGet]
+        [Route("getalldetails/{userId}")]       //checked in postman
+        public IQueryable<Ticket> GetSelectedUserAllDetail(int userId)
+        {
+            IQueryable<Ticket> ListOfticket = dbContext.Ticket.Where(t => t.User.UserId == userId);
+            return ListOfticket;
 
         }
 
@@ -98,18 +97,13 @@ namespace TrainTicket.API.Controllers
         /// <param name="userId"></param>
         /// <returns>bool value</returns>
         [HttpGet]
-        [Route("checkexist/{userId}")]
+        [Route("checkexist/{userId}")]          //checked in postman
         public bool CheckUserExist(int userId)
         {
-            string userFromJson = FileManager.ReadAllText("User.json");
-            List<User> userlistTemp = JsonConvert.DeserializeObject<List<User>>(userFromJson);
-
-            foreach (User item in userlistTemp)
+            User user = dbContext.User.Where(u => u.UserId == userId).FirstOrDefault();
+            if (user!= null)
             {
-                if (item.UserId == userId)
-                {
-                    return true;
-                }
+                return true;
             }
 
             return false;

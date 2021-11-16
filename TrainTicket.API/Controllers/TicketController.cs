@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using TrainTicket.API.Data;
 using TrainTicket.API.Models;
 using TrainTicket.API.Utility;
 
@@ -14,38 +15,51 @@ namespace TrainTicket.API.Controllers
     public class TicketController : ApiController
     {
         FileManager FileManager = new FileManager();
+        private TrainTicketDataContext dbContext = new TrainTicketDataContext();
+
+        [HttpGet]
+        [Route("")]         //checked in postman
+        public IQueryable<Ticket> DisplayAllTicket()
+        {
+            return dbContext.Ticket;
+        }
 
         [HttpPatch]
-        [Route("buy")]
-        public User BuyTicket(int userId, int numofTickets, Train selectedTrain, TrainClassEnum selectedClass)
+        [Route("buy/{userId}/{numOfTicket}/{selectedClass}")]
+        public User BuyTicket1(int userId, int numOfTicket, TrainClassEnum selectedClass, Train selectedTrain)
         {
-            string userFromJson = FileManager.ReadAllText("User.json");
-            List<User> userlistTemp = JsonConvert.DeserializeObject<List<User>>(userFromJson);
+            User user = dbContext.User.Find(userId);
 
-            var currentUser = userlistTemp.Where(x => x.UserId == userId).FirstOrDefault();
-            if (currentUser == null)
+            Ticket ticket = new Ticket()
             {
-                return null;
-            }
-
-            int idCount = currentUser.TicketHistory.Count();
-
-            userlistTemp.Remove(currentUser);
-            currentUser.TicketHistory.Add(new Ticket()
-            {
-                TicketId = ++idCount,
-                BookingTime = DateTime.Now,
-                SelectedClass = selectedClass,
                 SelectedTrain = selectedTrain,
-                NumOfTickets = numofTickets
-            });
+                SelectedClass = selectedClass,
+                BookingTime = DateTime.Now,
+                NumOfTickets = numOfTicket,
+                UserId = user.UserId
+            };
 
-            var updatedString = JsonConvert.SerializeObject(userlistTemp, Formatting.Indented);
-            FileManager.WriteAllText("User.json", updatedString);
+            dbContext.Ticket.Add(ticket);
+            dbContext.SaveChanges();
 
-            return currentUser;
+            return user;
         }
-            
+
+        [HttpPatch]
+        [Route("buy2")]
+        public Ticket BuyTicket2(int userId, TrainClassEnum selectedClass)
+        {
+            Ticket ticket = dbContext.Ticket.Where(t => t.User.UserId == userId).LastOrDefault();
+            ticket.SelectedClass = selectedClass;
+            ticket.BookingTime = DateTime.Now;
+
+            dbContext.Ticket.Add(ticket);
+            dbContext.SaveChanges();
+
+            return ticket;
+
+        }
+
 
         /// <summary>
         /// 
@@ -56,14 +70,11 @@ namespace TrainTicket.API.Controllers
         [Route("finalcost/{userId}")]
         public double GrandTotal(int userId)
         {
-            string userFromJson = FileManager.ReadAllText("User.json");
-            List<User> userlistTemp = JsonConvert.DeserializeObject<List<User>>(userFromJson);
             double finalCost = 0;
             double price = 0;
-
-            var currentUser = userlistTemp.Where(x => x.UserId == userId).FirstOrDefault();
-            var ticketHistory = currentUser.TicketHistory.Last();
-
+            //fares are empty now. fares are from TrainCotroller
+            //trainSelected = null!!
+            Ticket ticketHistory = dbContext.Ticket.Where(t => t.User.UserId == userId && t.TicketId==8).FirstOrDefault();
 
             if (ticketHistory.SelectedClass == TrainClassEnum.FirstClass)
             {
@@ -80,6 +91,9 @@ namespace TrainTicket.API.Controllers
 
             finalCost = price * ticketHistory.NumOfTickets;
             ticketHistory.GrandTotal = finalCost;
+            dbContext.Ticket.Add(ticketHistory);
+            dbContext.SaveChanges();
+
             return finalCost;
 
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
 using TrainTicket.API.Utility;
@@ -14,5 +15,9 @@ namespace TrainTicket.API.Models
         public DateTime BookingTime { get; set; }
         public int NumOfTickets { get; set; }
         public double GrandTotal { get; set; }
+
+        [ForeignKey(nameof(Ticket.User))]
+        public int UserId { get; set; }
+        public User User { get; set; }
     }
 }
