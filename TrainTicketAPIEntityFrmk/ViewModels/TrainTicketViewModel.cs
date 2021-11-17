@@ -17,7 +17,7 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
         internal TrainTicketViewModel()
         {
             _trainticketClient = new HttpClient();
-            _trainticketClient.BaseAddress = new Uri("https://trainticket.booking"); ///https://localhost:44355
+            _trainticketClient.BaseAddress = new Uri("https://localhost:44355");
 
             //no more initialise => SEEDING
 
