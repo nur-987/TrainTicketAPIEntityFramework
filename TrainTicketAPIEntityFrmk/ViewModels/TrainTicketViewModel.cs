@@ -17,25 +17,24 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
         internal TrainTicketViewModel()
         {
             _trainticketClient = new HttpClient();
-            _trainticketClient.BaseAddress = new Uri("https://trainticket.booking");
+            _trainticketClient.BaseAddress = new Uri("https://trainticket.booking"); ///https://localhost:44355
 
-            //initialise the user
+            //no more initialise => SEEDING
+
+        }
+
+        public List<User> GetAllUsers()
+        {
             var responseTask = _trainticketClient.GetAsync("api/user");
             responseTask.Wait();
             var result = responseTask.Result;
             if (result.IsSuccessStatusCode)
             {
-
+                var readTask = result.Content.ReadAsAsync<List<User>>();
+                readTask.Wait();
+                return readTask.Result;
             }
-
-            //initialise the train
-            var responseTask2 = _trainticketClient.GetAsync("api/train");
-            responseTask2.Wait();
-            var result2 = responseTask.Result;
-            if (result2.IsSuccessStatusCode)
-            {
-
-            }
+            return null;
 
         }
 
@@ -53,6 +52,40 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
             }
 
             return userId;
+        }
+
+        public Ticket GetSelectedUserDetail(int userId)
+        {
+            //latest train history
+            var responseTask = _trainticketClient.GetAsync("api/user/getdetails/" + userId);
+            responseTask.Wait();
+            var result = responseTask.Result;
+            if (result.IsSuccessStatusCode)
+            {
+                var readTask = result.Content.ReadAsAsync<Ticket>();
+                readTask.Wait();
+                return readTask.Result;
+            }
+
+            return null;
+
+        }
+
+        public IQueryable<Ticket> GetSelectedUserAllDetail(int userId)
+        {
+            //all the train history
+            var responseTask = _trainticketClient.GetAsync("api/user/getalldetails/" + userId);
+            responseTask.Wait();
+            var result = responseTask.Result;
+            if (result.IsSuccessStatusCode)
+            {
+                var readTask = result.Content.ReadAsAsync<IQueryable<Ticket>>();
+                readTask.Wait();
+                return readTask.Result;
+            }
+
+            return null;
+
         }
 
         public bool CheckUserExist(int userId)
@@ -74,23 +107,7 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
             return false;
         }
 
-        public User GetSelectedUserDetail(int userId)
-        {
-            //all the train history
-            var responseTask = _trainticketClient.GetAsync("api/user/getdetails/" + userId);
-            responseTask.Wait();
-            var result = responseTask.Result;
-            if (result.IsSuccessStatusCode)
-            {
-                var readTask = result.Content.ReadAsAsync<User>();
-                readTask.Wait();
-                return readTask.Result;
-            }
-
-            return null;
-
-        }
-
+        
         public Ticket GetSelectedUserDetailSpecific(int userId)
         {
             //only current train history (no user)
@@ -139,7 +156,7 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
 
         public List<Train> GetTrainsBetweenStations(string start, string end)
         {
-            var responseTask = _trainticketClient.GetAsync("api/train/getbetween?start=" + start + "&end=" + end);
+            var responseTask = _trainticketClient.GetAsync("api/train/getbetween/" + start + "/" + end);
             responseTask.Wait();
             var result = responseTask.Result;
             if (result.IsSuccessStatusCode)
@@ -151,9 +168,23 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
             return null;
         }
 
-        public User BuyTicket(int userId, int numofTickets, Train selectedTrain, TrainClassEnum selectedClass)
+        public IQueryable<Ticket> DisplayAllTicket()
         {
-            var responseTask = _trainticketClient.GetAsync("api/ticket/buy?userId=" + userId + "&numofTickets=" + numofTickets);
+            var responseTask = _trainticketClient.GetAsync("api/ticket");
+            responseTask.Wait();
+            var result = responseTask.Result;
+            if (result.IsSuccessStatusCode)
+            {
+                var readTask = result.Content.ReadAsAsync<IQueryable<Ticket>>();
+                readTask.Wait();
+                return readTask.Result;
+            }
+            return null;
+        }
+
+        public User BuyTicket(int userId, int numofTickets, TrainClassEnum selectedClass, Train selectedTrain)
+        {
+            var responseTask = _trainticketClient.GetAsync("api/ticket/buy/" + userId + "/" + numofTickets + "/" + selectedClass);      //train class from body??
             responseTask.Wait();
             var result = responseTask.Result;
             if (result.IsSuccessStatusCode)
@@ -168,7 +199,7 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
         }
 
         public string GrandTotal(int userId)
-        {
+        {   //different return from API. Possible?
             var responseTask = _trainticketClient.GetAsync("api/ticket/finalcost/"+ userId);
             responseTask.Wait();
             var result = responseTask.Result;

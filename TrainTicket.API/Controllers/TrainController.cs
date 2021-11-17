@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using TrainTicket.API.Data;
 using TrainTicket.API.Models;
 using TrainTicket.API.Utility;
 
@@ -14,13 +15,21 @@ namespace TrainTicket.API.Controllers
     [RoutePrefix("api/train")]
     public class TrainController : ApiController
     {
-        public FileManager FileManager = new FileManager();
-        private List<Train> _trainlistJson;
         IAppConfiguration _config;
+        TrainTicketDataContext dbContext;
         public TrainController()      //interface boxing; allow for mocking
         {
             _config = new AppConfiguration();
             _config.Initialize(300, 250, 150, 3.5, 2.5, 1.5);
+            dbContext = new TrainTicketDataContext();
+        }
+
+
+        [HttpGet]
+        [Route("")]         //checked in postman
+        public IQueryable<Train> DisplayAllTrain()
+        {
+            return dbContext.Trains;
         }
 
         /// <summary>
@@ -28,9 +37,10 @@ namespace TrainTicket.API.Controllers
         /// </summary>
         /// <returns>list of available trains</returns>
         [HttpPost]
-        [Route("addtrain")]
+        [Route("addtrain")]         //checked in postman
         public List<Train> CreateTrainList()
         {
+            //move to seed? 
             Train train1 = new Train()
             {
                 TrainId = 1,
@@ -144,33 +154,19 @@ namespace TrainTicket.API.Controllers
             AvailableTrainList.Add(train9);
             AvailableTrainList.Add(train10);
 
-            //add to json file
-            string trainListJson = JsonConvert.SerializeObject(AvailableTrainList);
-            FileManager.WriteAllText("TrainList.json", trainListJson);
-
-            return AvailableTrainList;
-        }
-
-        /// <summary>
-        /// calls the createTrain method if there is no train.json file
-        /// calls the config to calculate the train fares for all classess and routes
-        /// </summary>
-        [HttpGet]
-        [Route("")]
-        public void Initialize()
-        {
-            if (!File.Exists("TrainList.json"))
-            {
-                CreateTrainList();
-            }
-            string trainFromJson = FileManager.ReadAllText("TrainList.json");
-            _trainlistJson = JsonConvert.DeserializeObject<List<Train>>(trainFromJson);
-            foreach (Train train in _trainlistJson)
+            foreach (Train train in AvailableTrainList)
             {
                 train.BusinessClassFare = _config.BusinessClassBasePrice + train.Distance * _config.BusinessClassDistanceMultiplier;
                 train.EconomyClassFare = _config.EconomyClassBasePrice + train.Distance * _config.EconomyClassDistanceMultiplier;
                 train.FirstClassFare = _config.FirstClassBasePrice + train.Distance * _config.FirstClassDistanceMultiplier;
+
+                dbContext.Trains.Add(train);
             }
+
+            dbContext.SaveChanges();
+
+            //displays all trains
+            return dbContext.Trains.ToList();
         }
 
         /// <summary>
@@ -178,14 +174,13 @@ namespace TrainTicket.API.Controllers
         /// </summary>
         /// <returns>a list of start stations</returns>
         [HttpGet]
-        [Route("getstart")]
+        [Route("getstart")]         //checked in postman
         public List<string> GetAllStartStations()
         {
-            string trainFromJson = FileManager.ReadAllText("TrainList.json");
-            _trainlistJson = JsonConvert.DeserializeObject<List<Train>>(trainFromJson);
+            List<Train> AvailableTrainList = dbContext.Trains.ToList();
 
             List<string> startStationList = new List<string>();
-            foreach (Train train in _trainlistJson)
+            foreach (Train train in AvailableTrainList)
             {
                 if (!startStationList.Contains(train.StartDestination))
                 {
@@ -201,14 +196,13 @@ namespace TrainTicket.API.Controllers
         /// </summary>
         /// <returns>a list of end stations</returns>
         [HttpGet]
-        [Route("getend")]
+        [Route("getend")]           //checked in postman
         public List<string> GetAllEndStations()
         {
-            string trainFromJson = FileManager.ReadAllText("TrainList.json");
-            _trainlistJson = JsonConvert.DeserializeObject<List<Train>>(trainFromJson);
+            List<Train> AvailableTrainList = dbContext.Trains.ToList();
 
             List<string> endStationList = new List<string>();
-            foreach (Train train in _trainlistJson)
+            foreach (Train train in AvailableTrainList)
             {
                 if (!endStationList.Contains(train.EndDestination))
                 {
@@ -225,14 +219,14 @@ namespace TrainTicket.API.Controllers
         /// <param name="start">start station as chosen by user</param>
         /// <param name="end">end station as chosen by user</param>
         /// <returns>list of available routes between the chossen stations</returns>
+        /// if no result, return empty list
         [HttpGet]
-        [Route("getbetween")]
+        [Route("getbetween/{start}/{end}")]         //checked in postman
         public List<Train> GetTrainsBetweenStations(string start, string end)
         {
-            string trainFromJson = FileManager.ReadAllText("TrainList.json");
-            _trainlistJson = JsonConvert.DeserializeObject<List<Train>>(trainFromJson);
+            List<Train> AvailableTrainList = dbContext.Trains.ToList();
 
-            return _trainlistJson.Where(x => string.Equals(x.EndDestination, end, StringComparison.OrdinalIgnoreCase)
+            return AvailableTrainList.Where(x => string.Equals(x.EndDestination, end, StringComparison.OrdinalIgnoreCase)
             && string.Equals(x.StartDestination, start, StringComparison.OrdinalIgnoreCase)).ToList();
         }
 

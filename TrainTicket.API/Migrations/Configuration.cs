@@ -6,6 +6,7 @@
     using System.Data.Entity.Migrations;
     using System.Linq;
     using TrainTicket.API.Models;
+    using TrainTicket.API.Utility;
 
     internal sealed class Configuration : DbMigrationsConfiguration<TrainTicket.API.Data.TrainTicketDataContext>
     {
@@ -16,6 +17,8 @@
 
         protected override void Seed(TrainTicket.API.Data.TrainTicketDataContext context)
         {
+            IAppConfiguration _config = new AppConfiguration();
+            _config.Initialize(300, 250, 150, 3.5, 2.5, 1.5);
 
             Train train1 = new Train()
             {
@@ -118,6 +121,27 @@
 
             };
 
+            List<Train> AvailableTrainList = new List<Train>();
+            AvailableTrainList.Add(train1);
+            AvailableTrainList.Add(train2);
+            AvailableTrainList.Add(train3);
+            AvailableTrainList.Add(train4);
+            AvailableTrainList.Add(train5);
+            AvailableTrainList.Add(train6);
+            AvailableTrainList.Add(train7);
+            AvailableTrainList.Add(train8);
+            AvailableTrainList.Add(train9);
+            AvailableTrainList.Add(train10);
+
+            foreach (Train train in AvailableTrainList)
+            {
+                train.BusinessClassFare = _config.BusinessClassBasePrice + train.Distance * _config.BusinessClassDistanceMultiplier;
+                train.EconomyClassFare = _config.EconomyClassBasePrice + train.Distance * _config.EconomyClassDistanceMultiplier;
+                train.FirstClassFare = _config.FirstClassBasePrice + train.Distance * _config.FirstClassDistanceMultiplier;
+
+                context.Trains.Add(train);
+            }
+
             User user1 = new User()
             {
                 UserId = 1,
@@ -146,16 +170,6 @@
 
             };
 
-            context.Trains.Add(train1);
-            context.Trains.Add(train2);
-            context.Trains.Add(train3);
-            context.Trains.Add(train4);
-            context.Trains.Add(train5);
-            context.Trains.Add(train6);
-            context.Trains.Add(train7);
-            context.Trains.Add(train8);
-            context.Trains.Add(train9);
-            context.Trains.Add(train10);
             context.User.Add(user1);
             context.Ticket.Add(ticket);
             context.Ticket.Add(ticket2);

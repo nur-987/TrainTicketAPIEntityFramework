@@ -92,17 +92,15 @@
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\TicketController.cs" />
-    <Compile Include="Controllers\TicketsController.cs" />
     <Compile Include="Controllers\TrainController.cs" />
     <Compile Include="Controllers\UserController.cs" />
-    <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Data\TrainTicketDataContext.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202111160601583_v1.cs" />
-    <Compile Include="Migrations\202111160601583_v1.Designer.cs">
-      <DependentUpon>202111160601583_v1.cs</DependentUpon>
+    <Compile Include="Migrations\202111170552486_v1.cs" />
+    <Compile Include="Migrations\202111170552486_v1.Designer.cs">
+      <DependentUpon>202111170552486_v1.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Ticket.cs" />
@@ -134,8 +132,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202111160601583_v1.resx">
-      <DependentUpon>202111160601583_v1.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202111170552486_v1.resx">
+      <DependentUpon>202111170552486_v1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

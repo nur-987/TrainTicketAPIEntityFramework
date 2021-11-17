@@ -48,11 +48,12 @@ namespace TrainTicket.API.Controllers
         [Route("adduser/{name}")]       //checked in postman
         [ResponseType(typeof(User))]
         public IHttpActionResult AddNewUser(string name)
-        { 
+        {
             User user1 = new User()
             {
                 //ID is auto
-                Name = name
+                Name = name,
+                TicketHistory = new List<Ticket>()
 
             };
 
@@ -72,7 +73,7 @@ namespace TrainTicket.API.Controllers
         [Route("getdetails/{userId}")]      //checked in postman
         public Ticket GetSelectedUserDetail(int userId)
         {
-           Ticket ticket = dbContext.Ticket.Where(t => t.User.UserId == userId).LastOrDefault();
+           Ticket ticket = dbContext.Ticket.Include("SelectedTrain").Include("User").Where(t => t.User.UserId == userId).LastOrDefault();
            return ticket;
 
         }
@@ -86,7 +87,7 @@ namespace TrainTicket.API.Controllers
         [Route("getalldetails/{userId}")]       //checked in postman
         public IQueryable<Ticket> GetSelectedUserAllDetail(int userId)
         {
-            IQueryable<Ticket> ListOfticket = dbContext.Ticket.Where(t => t.User.UserId == userId);
+            IQueryable<Ticket> ListOfticket = dbContext.Ticket.Include("SelectedTrain").Include("User").Where(t => t.User.UserId == userId);
             return ListOfticket;
 
         }

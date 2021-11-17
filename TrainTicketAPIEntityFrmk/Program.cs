@@ -155,7 +155,7 @@ namespace TrainTicketAPIEntityFrmk
                             //change this to a method?
                             trainSelected = availableTrainRoutesList.First(x => x.TrainId == temptrainId);
 
-                            //display class options and their cost.
+                            //display chosen train
                             Console.WriteLine("You have selected a train");
                             Console.WriteLine($"FROM: {trainSelected.StartDestination} TO: {trainSelected.EndDestination}");
                             Console.WriteLine($"Train Departure Time: {trainSelected.DepartureTime.ToShortTimeString()}");
@@ -179,6 +179,7 @@ namespace TrainTicketAPIEntityFrmk
                         int tempNumofTicket = 0;
                         try
                         {
+                            //display class options and their cost.
                             Console.WriteLine("Please choose a train class: ");
                             Console.WriteLine($"1) {TrainClassEnum.FirstClass} Price:$ {trainSelected.FirstClassFare}");
                             Console.WriteLine($"2) {TrainClassEnum.BusinessClass} Price:$ {trainSelected.BusinessClassFare}");
@@ -191,7 +192,7 @@ namespace TrainTicketAPIEntityFrmk
                             Console.WriteLine("Enter the total number of tickets to purchase:");
                             tempNumofTicket = Int32.Parse(Console.ReadLine());
 
-                            trainvm.BuyTicket(userId, tempNumofTicket, trainSelected, selectedClass);
+                            trainvm.BuyTicket(userId, tempNumofTicket, selectedClass, trainSelected);
                             travelClassSelectionFlag = false;
 
                         }
@@ -208,9 +209,19 @@ namespace TrainTicketAPIEntityFrmk
                     {
 
                         Console.WriteLine("Here are your booking details.");
-                        trainvm.GetSelectedUserDetailSpecific(userId);
+                        var ticket = trainvm.GetSelectedUserDetail(userId);
 
-                        trainvm.GrandTotal(userId);
+                        Console.WriteLine("Ticket Id: " + ticket.TicketId);
+                        Console.Write("Start Destination: " + ticket.SelectedTrain.StartDestination + "   ");
+                        Console.WriteLine("End Destination: " + ticket.SelectedTrain.EndDestination);
+                        Console.Write("Departure Time: " + ticket.SelectedTrain.DepartureTime.ToShortTimeString() + "   ");
+                        Console.WriteLine("Arrrival Time: " + ticket.SelectedTrain.ArrivalTime.ToShortTimeString());
+                        Console.WriteLine("Number of tickets: " + ticket.NumOfTickets);
+                        Console.WriteLine("Selected Class: " + ticket.SelectedClass);
+
+                        string finalCost = trainvm.GrandTotal(userId);
+                        Console.WriteLine("Total Cost:$ " + ticket.GrandTotal);
+
                         finalConfirmation = false;
 
                     }
@@ -233,7 +244,7 @@ namespace TrainTicketAPIEntityFrmk
                             userId = Int32.Parse(Console.ReadLine());
                             if (trainvm.CheckUserExist(userId))
                             {
-                                trainvm.GetSelectedUserDetail(userId);
+                                trainvm.GetSelectedUserAllDetail(userId);
                                 userDetailsFlag = false;
                             }
                             else

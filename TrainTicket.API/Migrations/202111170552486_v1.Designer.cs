@@ -13,7 +13,7 @@ namespace TrainTicket.API.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202111160601583_v1"; }
+            get { return "202111170552486_v1"; }
         }
         
         string IMigrationMetadata.Source

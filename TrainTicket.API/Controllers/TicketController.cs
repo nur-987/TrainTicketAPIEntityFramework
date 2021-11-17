@@ -24,18 +24,20 @@ namespace TrainTicket.API.Controllers
             return dbContext.Ticket;
         }
 
-        [HttpPatch]
-        [Route("buy/{userId}/{numOfTicket}/{selectedClass}")]
-        public User BuyTicket1(int userId, int numOfTicket, TrainClassEnum selectedClass, Train selectedTrain)
+        [HttpPost]
+        [Route("buy/{userId}/{numOfTicket}/{selectedClass}")]           //checked in postman
+        public User BuyTicket(int userId, int numOfTicket, TrainClassEnum selectedClass, Train selectedTrain)
         {
             User user = dbContext.User.Find(userId);
+            Train train = dbContext.Trains.Find(selectedTrain.TrainId);
 
             Ticket ticket = new Ticket()
             {
-                SelectedTrain = selectedTrain,
+                SelectedTrain = train,
                 SelectedClass = selectedClass,
                 BookingTime = DateTime.Now,
                 NumOfTickets = numOfTicket,
+                User = user,
                 UserId = user.UserId
             };
 
@@ -45,21 +47,6 @@ namespace TrainTicket.API.Controllers
             return user;
         }
 
-        [HttpPatch]
-        [Route("buy2")]
-        public Ticket BuyTicket2(int userId, TrainClassEnum selectedClass)
-        {
-            Ticket ticket = dbContext.Ticket.Where(t => t.User.UserId == userId).LastOrDefault();
-            ticket.SelectedClass = selectedClass;
-            ticket.BookingTime = DateTime.Now;
-
-            dbContext.Ticket.Add(ticket);
-            dbContext.SaveChanges();
-
-            return ticket;
-
-        }
-
 
         /// <summary>
         /// 
@@ -67,14 +54,14 @@ namespace TrainTicket.API.Controllers
         /// <param name="userId"></param>
         /// <returns>final cost based on chosen route, class and num of tickets</returns>
         [HttpPatch]
-        [Route("finalcost/{userId}")]
+        [Route("finalcost/{userId}")]       //checked in postman
         public double GrandTotal(int userId)
         {
             double finalCost = 0;
             double price = 0;
-            //fares are empty now. fares are from TrainCotroller
-            //trainSelected = null!!
-            Ticket ticketHistory = dbContext.Ticket.Where(t => t.User.UserId == userId && t.TicketId==8).FirstOrDefault();
+
+            var ticketHistory = dbContext.Ticket.Include("SelectedTrain").Include("User").Where(t => t.User.UserId == userId)
+                            .OrderByDescending(t => t.BookingTime).FirstOrDefault();
 
             if (ticketHistory.SelectedClass == TrainClassEnum.FirstClass)
             {
@@ -91,7 +78,9 @@ namespace TrainTicket.API.Controllers
 
             finalCost = price * ticketHistory.NumOfTickets;
             ticketHistory.GrandTotal = finalCost;
-            dbContext.Ticket.Add(ticketHistory);
+
+            dbContext.Entry(ticketHistory).State = System.Data.Entity.EntityState.Modified;
+
             dbContext.SaveChanges();
 
             return finalCost;
