@@ -14,7 +14,6 @@ namespace TrainTicket.API.Controllers
     [RoutePrefix("api/ticket")]
     public class TicketController : ApiController
     {
-        FileManager FileManager = new FileManager();
         private TrainTicketDataContext dbContext = new TrainTicketDataContext();
 
         [HttpGet]

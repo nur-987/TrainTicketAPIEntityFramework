@@ -19,8 +19,6 @@ namespace TrainTicket.API.Controllers
     {
         public List<User> userList = new List<User>();
 
-        public FileManager FileManager = new FileManager();
-
         TrainTicketDataContext dbContext;
 
         public UserController()

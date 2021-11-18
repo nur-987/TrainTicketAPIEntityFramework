@@ -10,9 +10,6 @@ namespace TrainTicket.API.Utility
     /// </summary>
     public enum TrainClassEnum
     {
-        /// <summary>
-        /// Represents the First Class
-        /// </summary>
         FirstClass,
         BusinessClass,
         Economy
