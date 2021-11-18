@@ -73,8 +73,9 @@ namespace TrainTicket.API.Controllers
         [Route("getdetails/{userId}")]      //checked in postman
         public Ticket GetSelectedUserDetail(int userId)
         {
-           Ticket ticket = dbContext.Ticket.Include("SelectedTrain").Include("User").Where(t => t.User.UserId == userId).LastOrDefault();
-           return ticket;
+           Ticket ticket = dbContext.Ticket.Include("SelectedTrain").Include("User").Where(t => t.User.UserId == userId)
+                            .OrderByDescending(t => t.BookingTime).FirstOrDefault();
+            return ticket;
 
         }
 

@@ -49,7 +49,7 @@ namespace TrainTicketAPIEntityFrmk
                         {
                             Console.WriteLine("Enter your name: "); //create new user
                             string name = Console.ReadLine();
-                            int userID = trainvm.AddNewUser(name);
+                            userId = trainvm.AddNewUser(name);
                             userFlag = false;
 
                         }
@@ -220,7 +220,7 @@ namespace TrainTicketAPIEntityFrmk
                         Console.WriteLine("Selected Class: " + ticket.SelectedClass);
 
                         string finalCost = trainvm.GrandTotal(userId);
-                        Console.WriteLine("Total Cost:$ " + ticket.GrandTotal);
+                        Console.WriteLine("Total Cost:$ " + finalCost);
 
                         finalConfirmation = false;
 
@@ -244,7 +244,22 @@ namespace TrainTicketAPIEntityFrmk
                             userId = Int32.Parse(Console.ReadLine());
                             if (trainvm.CheckUserExist(userId))
                             {
-                                trainvm.GetSelectedUserAllDetail(userId);
+                                IList<Ticket> ticket = trainvm.GetSelectedUserAllDetail(userId);
+                                foreach (var item in ticket)
+                                {
+                                    Console.WriteLine("Ticket ID: " + item.TicketId);
+                                    Console.WriteLine("Train ID: " + item.SelectedTrain.TrainId);
+                                    Console.WriteLine("Start Station: " + item.SelectedTrain.StartDestination);
+                                    Console.WriteLine("End Station: " + item.SelectedTrain.EndDestination);
+                                    Console.WriteLine("Departure Time: " + item.SelectedTrain.DepartureTime.ToShortTimeString());
+                                    Console.WriteLine("Arrival Time:  " + item.SelectedTrain.ArrivalTime.ToShortTimeString());
+                                    Console.WriteLine("Selected Class: " + item.SelectedClass);
+                                    Console.WriteLine("Number of Tickets: " + item.NumOfTickets);
+                                    Console.WriteLine("Grand Total: " + item.GrandTotal);
+                                    Console.WriteLine("----------------------------");
+
+
+                                }
                                 //print here!!!!
                                 userDetailsFlag = false;
                             }
@@ -273,11 +288,6 @@ namespace TrainTicketAPIEntityFrmk
 
             }
             Console.ReadLine();
-        }
-        private static void Calculation_TransactionComplete(double totalCost)
-        {
-            Console.WriteLine("Please make payment of $" + totalCost + " within 24 hours");
-            Console.WriteLine("proceed to payment at: www.trainticketpayment.com");
         }
 
     }

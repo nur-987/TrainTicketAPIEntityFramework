@@ -23,25 +23,10 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
 
         }
 
-        public List<User> GetAllUsers()
-        {
-            var responseTask = _trainticketClient.GetAsync("api/user");
-            responseTask.Wait();
-            var result = responseTask.Result;
-            if (result.IsSuccessStatusCode)
-            {
-                var readTask = result.Content.ReadAsAsync<List<User>>();
-                readTask.Wait();
-                return readTask.Result;
-            }
-            return null;
-
-        }
-
         public int AddNewUser(string name)
         {
             int userId = 0;
-            var responseTask = _trainticketClient.GetAsync("api/user/adduser/" + name);
+            var responseTask = _trainticketClient.PostAsJsonAsync("api/user/adduser/" + name, name );
             responseTask.Wait();
             var result = responseTask.Result;
             if (result.IsSuccessStatusCode)
@@ -49,6 +34,7 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
                 var readTask = result.Content.ReadAsStringAsync();
                 readTask.Wait();
                 userId = Int32.Parse(readTask.Result);
+                return userId;
             }
 
             return userId;
@@ -83,21 +69,6 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
                 readTask.Wait();
                 var stringResult = readTask.Result; //giving me a json string
                 IList<Ticket> convert = JsonConvert.DeserializeObject<IList<Ticket>>(stringResult);
-                foreach (var item in convert)
-                {
-                    Console.WriteLine("Ticket ID: "+ item.TicketId);
-                    Console.WriteLine("Train ID: " + item.SelectedTrain.TrainId);
-                    Console.WriteLine("Start Station: " + item.SelectedTrain.StartDestination);
-                    Console.WriteLine("End Station: " + item.SelectedTrain.EndDestination);
-                    Console.WriteLine("Departure Time: " + item.SelectedTrain.DepartureTime.ToShortTimeString());
-                    Console.WriteLine("Arrival Time:  " + item.SelectedTrain.ArrivalTime.ToShortTimeString());
-                    Console.WriteLine("Selected Class: " + item.SelectedClass);
-                    Console.WriteLine("Number of Tickets: " + item.NumOfTickets);
-                    Console.WriteLine("Grand Total: " + item.GrandTotal);
-                    Console.WriteLine("----------------------------");
-
-                
-                }
 
                 return convert;
             }
@@ -123,25 +94,6 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
 
             }
             return false;
-        }
-
-        
-        public Ticket GetSelectedUserDetailSpecific(int userId)
-        {
-            //only current train history (no user)
-            var responseTask = _trainticketClient.GetAsync("api/user/getdetails/" + userId);
-            responseTask.Wait();
-            var result = responseTask.Result;
-            if (result.IsSuccessStatusCode)
-            {
-                var readTask = result.Content.ReadAsAsync<User>();
-                readTask.Wait();
-                Ticket specificTrainDetail = readTask.Result.TicketHistory.LastOrDefault();
-                return specificTrainDetail;
-            }
-
-            return null;
-
         }
 
         public List<string> GetAllStartStations()
@@ -186,23 +138,9 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
             return null;
         }
 
-        public IQueryable<Ticket> DisplayAllTicket()
-        {
-            var responseTask = _trainticketClient.GetAsync("api/ticket");
-            responseTask.Wait();
-            var result = responseTask.Result;
-            if (result.IsSuccessStatusCode)
-            {
-                var readTask = result.Content.ReadAsAsync<IQueryable<Ticket>>();
-                readTask.Wait();
-                return readTask.Result;
-            }
-            return null;
-        }
-
         public User BuyTicket(int userId, int numofTickets, TrainClassEnum selectedClass, Train selectedTrain)
         {
-            var responseTask = _trainticketClient.GetAsync("api/ticket/buy/" + userId + "/" + numofTickets + "/" + selectedClass);      //train class from body??
+            var responseTask = _trainticketClient.PostAsJsonAsync("api/ticket/buy/" + userId + "/" + numofTickets + "/" + selectedClass, selectedTrain);      //train class from body??
             responseTask.Wait();
             var result = responseTask.Result;
             if (result.IsSuccessStatusCode)
@@ -217,8 +155,10 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
         }
 
         public string GrandTotal(int userId)
-        {   //different return from API. Possible?
-            var responseTask = _trainticketClient.GetAsync("api/ticket/finalcost/"+ userId);
+        {   
+
+            double content = 0;
+            var responseTask = _trainticketClient.PutAsJsonAsync("api/ticket/finalcost/"+ userId, content);
             responseTask.Wait();
             var result = responseTask.Result;
             if (result.IsSuccessStatusCode)
@@ -230,5 +170,38 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
 
             return null;
         }
+
+        #region other functions
+        //public IQueryable<Ticket> DisplayAllTicket()
+        //{
+        //    var responseTask = _trainticketClient.GetAsync("api/ticket");
+        //    responseTask.Wait();
+        //    var result = responseTask.Result;
+        //    if (result.IsSuccessStatusCode)
+        //    {
+        //        var readTask = result.Content.ReadAsAsync<IQueryable<Ticket>>();
+        //        readTask.Wait();
+        //        return readTask.Result;
+
+        //      NEED TO DESERIALIZE JSON
+        //    }
+        //    return null;
+        //}
+
+        //public List<User> GetAllUsers()
+        //{
+        //    var responseTask = _trainticketClient.GetAsync("api/user");
+        //    responseTask.Wait();
+        //    var result = responseTask.Result;
+        //    if (result.IsSuccessStatusCode)
+        //    {
+        //        var readTask = result.Content.ReadAsAsync<List<User>>();
+        //        readTask.Wait();
+        //        return readTask.Result;
+        //    }
+        //    return null;
+
+        //}
+        #endregion
     }
 }

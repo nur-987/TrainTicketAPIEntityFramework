@@ -53,7 +53,7 @@ namespace TrainTicket.API.Controllers
         /// </summary>
         /// <param name="userId"></param>
         /// <returns>final cost based on chosen route, class and num of tickets</returns>
-        [HttpPatch]
+        [HttpPut]
         [Route("finalcost/{userId}")]       //checked in postman
         public double GrandTotal(int userId)
         {
