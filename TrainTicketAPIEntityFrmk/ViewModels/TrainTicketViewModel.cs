@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -11,13 +12,12 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
     class TrainTicketViewModel
     {
         //subscribe to service
-
         private readonly HttpClient _trainticketClient;
 
         internal TrainTicketViewModel()
         {
             _trainticketClient = new HttpClient();
-            _trainticketClient.BaseAddress = new Uri("https://localhost:44355");
+            _trainticketClient.BaseAddress = new Uri("https://localhost:44375/");
 
             //no more initialise => SEEDING
 
@@ -71,7 +71,7 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
 
         }
 
-        public IQueryable<Ticket> GetSelectedUserAllDetail(int userId)
+        public IList<Ticket> GetSelectedUserAllDetail(int userId)
         {
             //all the train history
             var responseTask = _trainticketClient.GetAsync("api/user/getalldetails/" + userId);
@@ -79,9 +79,27 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
             var result = responseTask.Result;
             if (result.IsSuccessStatusCode)
             {
-                var readTask = result.Content.ReadAsAsync<IQueryable<Ticket>>();
+                var readTask = result.Content.ReadAsStringAsync();
                 readTask.Wait();
-                return readTask.Result;
+                var stringResult = readTask.Result; //giving me a json string
+                IList<Ticket> convert = JsonConvert.DeserializeObject<IList<Ticket>>(stringResult);
+                foreach (var item in convert)
+                {
+                    Console.WriteLine("Ticket ID: "+ item.TicketId);
+                    Console.WriteLine("Train ID: " + item.SelectedTrain.TrainId);
+                    Console.WriteLine("Start Station: " + item.SelectedTrain.StartDestination);
+                    Console.WriteLine("End Station: " + item.SelectedTrain.EndDestination);
+                    Console.WriteLine("Departure Time: " + item.SelectedTrain.DepartureTime.ToShortTimeString());
+                    Console.WriteLine("Arrival Time:  " + item.SelectedTrain.ArrivalTime.ToShortTimeString());
+                    Console.WriteLine("Selected Class: " + item.SelectedClass);
+                    Console.WriteLine("Number of Tickets: " + item.NumOfTickets);
+                    Console.WriteLine("Grand Total: " + item.GrandTotal);
+                    Console.WriteLine("----------------------------");
+
+                
+                }
+
+                return convert;
             }
 
             return null;

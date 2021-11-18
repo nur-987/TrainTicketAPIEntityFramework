@@ -109,6 +109,10 @@
     <Compile Include="Migrations\202111170552486_v1.Designer.cs">
       <DependentUpon>202111170552486_v1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202111180519542_newAPI.cs" />
+    <Compile Include="Migrations\202111180519542_newAPI.designer.cs">
+      <DependentUpon>202111180519542_newAPI.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Ticket.cs" />
     <Compile Include="Models\Train.cs" />
@@ -124,7 +128,6 @@
     <None Include="packages.config" />
     <None Include="Properties\PublishProfiles\IISProfile.pubxml" />
     <None Include="Properties\PublishProfiles\IISProfile1.pubxml" />
-    <None Include="Properties\PublishProfiles\IISProfile2.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -145,6 +148,9 @@
     <EmbeddedResource Include="Migrations\202111170552486_v1.resx">
       <DependentUpon>202111170552486_v1.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202111180519542_newAPI.resx">
+      <DependentUpon>202111180519542_newAPI.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -164,8 +170,7 @@
           <IISUrl>https://localhost:44355/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
+          <CustomServerUrl>https://localhost:44355</CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>

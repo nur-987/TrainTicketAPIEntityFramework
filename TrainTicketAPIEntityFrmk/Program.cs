@@ -245,6 +245,7 @@ namespace TrainTicketAPIEntityFrmk
                             if (trainvm.CheckUserExist(userId))
                             {
                                 trainvm.GetSelectedUserAllDetail(userId);
+                                //print here!!!!
                                 userDetailsFlag = false;
                             }
                             else
