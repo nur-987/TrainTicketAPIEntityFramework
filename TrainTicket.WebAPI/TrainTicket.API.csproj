@@ -94,20 +94,12 @@
     <Compile Include="Controllers\TicketController.cs" />
     <Compile Include="Controllers\TrainController.cs" />
     <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Data\TrainDbInitializer.cs" />
     <Compile Include="Data\TrainTicketDataContext.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Interfaces\IAppConfiguration.cs" />
-    <Compile Include="Migrations\202111170552486_v1.cs" />
-    <Compile Include="Migrations\202111170552486_v1.Designer.cs">
-      <DependentUpon>202111170552486_v1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202111180519542_newAPI.cs" />
-    <Compile Include="Migrations\202111180519542_newAPI.Designer.cs">
-      <DependentUpon>202111180519542_newAPI.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\AppConfiguration.cs" />
   </ItemGroup>
@@ -130,14 +122,6 @@
       <Project>{53189e83-53a7-41a4-b690-993e904c29b1}</Project>
       <Name>TrainTicket.Common</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\202111170552486_v1.resx">
-      <DependentUpon>202111170552486_v1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202111180519542_newAPI.resx">
-      <DependentUpon>202111180519542_newAPI.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

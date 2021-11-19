@@ -1,24 +1,18 @@
-﻿namespace TrainTicket.API.Migrations
+﻿using System.Collections.Generic;
+using System;
+using System.Data.Entity;
+using TrainTicket.API.Data;
+using TrainTicket.API.Models;
+using TrainTicket.API.Utility;
+
+namespace TrainTicket.WebAPI.Data
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Data.Entity.Migrations;
-    using TrainTicket.API.Data;
-    using TrainTicket.API.Models;
-    using TrainTicket.API.Utility;
-
-    internal sealed class Configuration : DbMigrationsConfiguration<TrainTicketDataContext>
+    public class TrainDbInitializer : CreateDatabaseIfNotExists<TrainTicketDataContext>
     {
-        public Configuration()
-        {
-            AutomaticMigrationsEnabled = false;
-        }
-
         protected override void Seed(TrainTicketDataContext context)
         {
-            IAppConfiguration _config = new AppConfiguration();
-            _config.Initialize(300, 250, 150, 3.5, 2.5, 1.5);
-
+            AppConfiguration config = new AppConfiguration();
+            config.Initialize(300, 250, 150, 3.5, 2.5, 1.5);
             Train train1 = new Train()
             {
                 TrainId = 1,
@@ -134,50 +128,13 @@
 
             foreach (Train train in AvailableTrainList)
             {
-                train.BusinessClassFare = _config.BusinessClassBasePrice + train.Distance * _config.BusinessClassDistanceMultiplier;
-                train.EconomyClassFare = _config.EconomyClassBasePrice + train.Distance * _config.EconomyClassDistanceMultiplier;
-                train.FirstClassFare = _config.FirstClassBasePrice + train.Distance * _config.FirstClassDistanceMultiplier;
-
-                context.Trains.Add(train);
+                train.BusinessClassFare = config.BusinessClassBasePrice + train.Distance * config.BusinessClassDistanceMultiplier;
+                train.EconomyClassFare = config.EconomyClassBasePrice + train.Distance * config.EconomyClassDistanceMultiplier;
+                train.FirstClassFare = config.FirstClassBasePrice + train.Distance * config.FirstClassDistanceMultiplier;
             }
-
-            User user1 = new User()
-            {
-                UserId = 1,
-                Name = "Genny"
-            };
-            Ticket ticket = new Ticket()
-            {
-                TicketId = 1,
-                SelectedTrain = train1,
-                SelectedClass = 0,
-                BookingTime = DateTime.Now,
-                NumOfTickets = 2,
-                GrandTotal = 500,
-                UserId = 1
-
-            };
-            Ticket ticket2 = new Ticket()
-            {
-                TicketId = 2,
-                SelectedTrain = train1,
-                SelectedClass = 0,
-                BookingTime = DateTime.Now,
-                NumOfTickets = 2,
-                GrandTotal = 500,
-                UserId = 1
-
-            };
-
-            context.Users.Add(user1);
-            context.Tickets.Add(ticket);
-            context.Tickets.Add(ticket2);
-
-            context.SaveChanges();
-            //  This method will be called after migrating to the latest version.
-
-            //  You can use the DbSet<T>.AddOrUpdate() helper extension method
-            //  to avoid creating duplicate seed data.
+            context.Trains.AddRange(AvailableTrainList);
+            base.Seed(context);
         }
     }
+
 }
