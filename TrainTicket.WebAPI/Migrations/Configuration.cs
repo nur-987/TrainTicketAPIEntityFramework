@@ -2,20 +2,19 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Data.Entity;
     using System.Data.Entity.Migrations;
-    using System.Linq;
+    using TrainTicket.API.Data;
     using TrainTicket.API.Models;
     using TrainTicket.API.Utility;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<TrainTicket.API.Data.TrainTicketDataContext>
+    internal sealed class Configuration : DbMigrationsConfiguration<TrainTicketDataContext>
     {
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
         }
 
-        protected override void Seed(TrainTicket.API.Data.TrainTicketDataContext context)
+        protected override void Seed(TrainTicketDataContext context)
         {
             IAppConfiguration _config = new AppConfiguration();
             _config.Initialize(300, 250, 150, 3.5, 2.5, 1.5);
@@ -170,9 +169,9 @@
 
             };
 
-            context.User.Add(user1);
-            context.Ticket.Add(ticket);
-            context.Ticket.Add(ticket2);
+            context.Users.Add(user1);
+            context.Tickets.Add(ticket);
+            context.Tickets.Add(ticket2);
 
             context.SaveChanges();
             //  This method will be called after migrating to the latest version.

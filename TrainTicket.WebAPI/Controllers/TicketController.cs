@@ -1,13 +1,10 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 using TrainTicket.API.Data;
 using TrainTicket.API.Models;
-using TrainTicket.API.Utility;
+using TrainTicket.Common;
+using TrainTicket.Common.DTO;
 
 namespace TrainTicket.API.Controllers
 {
@@ -20,14 +17,14 @@ namespace TrainTicket.API.Controllers
         [Route("")]         //checked in postman
         public IQueryable<Ticket> DisplayAllTicket()
         {
-            return dbContext.Ticket;
+            return dbContext.Tickets;
         }
 
         [HttpPost]
         [Route("buy/{userId}/{numOfTicket}/{selectedClass}")]           //checked in postman
-        public User BuyTicket(int userId, int numOfTicket, TrainClassEnum selectedClass, Train selectedTrain)
+        public void BuyTicket(int userId, int numOfTicket, TrainClassEnum selectedClass, Train selectedTrain)
         {
-            User user = dbContext.User.Find(userId);
+            User user = dbContext.Users.Find(userId);
             Train train = dbContext.Trains.Find(selectedTrain.TrainId);
 
             Ticket ticket = new Ticket()
@@ -40,10 +37,8 @@ namespace TrainTicket.API.Controllers
                 UserId = user.UserId
             };
 
-            dbContext.Ticket.Add(ticket);
+            dbContext.Tickets.Add(ticket);
             dbContext.SaveChanges();
-
-            return user;
         }
 
 
@@ -59,7 +54,7 @@ namespace TrainTicket.API.Controllers
             double finalCost = 0;
             double price = 0;
 
-            var ticketHistory = dbContext.Ticket.Include("SelectedTrain").Include("User").Where(t => t.User.UserId == userId)
+            var ticketHistory = dbContext.Tickets.Include("SelectedTrain").Include("User").Where(t => t.User.UserId == userId)
                             .OrderByDescending(t => t.BookingTime).FirstOrDefault();
 
             if (ticketHistory.SelectedClass == TrainClassEnum.FirstClass)

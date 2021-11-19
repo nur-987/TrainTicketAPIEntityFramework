@@ -1,16 +1,11 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Data.Entity.Infrastructure;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Description;
+using System.Web.Http.Results;
 using TrainTicket.API.Data;
 using TrainTicket.API.Models;
-using TrainTicket.API.Utility;
+using TrainTicket.Common.DTO;
 
 namespace TrainTicket.API.Controllers
 {
@@ -32,9 +27,14 @@ namespace TrainTicket.API.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("")]     //checked in postman
-        public List<User> GetAllUser()
+        public IEnumerable<UserDTO> GetAllUser()
         {
-            return dbContext.User.ToList();
+            IEnumerable<UserDTO> result = new List<UserDTO>();
+            foreach (User user in dbContext.Users)
+            {
+                result.Append(ToDTO(user));
+            }
+            return result;
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace TrainTicket.API.Controllers
 
             };
 
-            dbContext.User.Add(user1);
+            dbContext.Users.Add(user1);
             dbContext.SaveChanges();
             
             return Ok(user1.UserId);
@@ -69,11 +69,11 @@ namespace TrainTicket.API.Controllers
         /// <returns>user details with complete train history</returns>
         [HttpGet]
         [Route("getdetails/{userId}")]      //checked in postman
-        public Ticket GetSelectedUserDetail(int userId)
+        public TicketDTO GetSelectedUserDetail(int userId)
         {
-           Ticket ticket = dbContext.Ticket.Include("SelectedTrain").Include("User").Where(t => t.User.UserId == userId)
+           Ticket ticket = dbContext.Tickets.Include("SelectedTrain").Include("User").Where(t => t.User.UserId == userId)
                             .OrderByDescending(t => t.BookingTime).FirstOrDefault();
-            return ticket;
+            return ToDTO(ticket);
 
         }
 
@@ -84,11 +84,15 @@ namespace TrainTicket.API.Controllers
         /// <returns>user details with complete train history</returns>
         [HttpGet]
         [Route("getalldetails/{userId}")]       //checked in postman
-        public IQueryable<Ticket> GetSelectedUserAllDetail(int userId)
+        public IEnumerable<TicketDTO> GetSelectedUserAllDetail(int userId)
         {
-            IQueryable<Ticket> ListOfticket = dbContext.Ticket.Include("SelectedTrain").Include("User")
-                                        .Where(t => t.User.UserId == userId);
-            return ListOfticket;
+            IEnumerable<TicketDTO> result = new List<TicketDTO>();
+            foreach (Ticket ticket in dbContext.Tickets.Include("SelectedTrain").Include("User")
+                                        .Where(t => t.User.UserId == userId))
+            {
+                result.Append(ToDTO(ticket));
+            }
+            return result;
 
         }
 
@@ -101,13 +105,51 @@ namespace TrainTicket.API.Controllers
         [Route("checkexist/{userId}")]          //checked in postman
         public bool CheckUserExist(int userId)
         {
-            User user = dbContext.User.Where(u => u.UserId == userId).FirstOrDefault();
+            User user = dbContext.Users.Where(u => u.UserId == userId).FirstOrDefault();
             if (user!= null)
             {
                 return true;
             }
 
             return false;
+        }
+
+        private TicketDTO ToDTO(Ticket ticket)
+        {
+            var dto = new TicketDTO();
+            dto.BookingTime = ticket.BookingTime;
+            dto.GrandTotal = ticket.GrandTotal;
+            dto.NumOfTickets = ticket.NumOfTickets;
+            dto.SelectedClass = ticket.SelectedClass;
+            dto.SelectedTrain = ToDTO(ticket.SelectedTrain);
+            dto.TicketId = ticket.TicketId;  
+            return dto;
+        }
+        private TrainDTO ToDTO(Train train)
+        {
+            var dto = new TrainDTO();
+            dto.ArrivalTime = train.ArrivalTime;
+            dto.BusinessClassFare = train.BusinessClassFare;
+            dto.DepartureTime = train.DepartureTime;
+            dto.Distance = train.Distance;
+            dto.EconomyClassFare = train.EconomyClassFare;
+            dto.EndDestination = train.EndDestination;
+            dto.FirstClassFare = train.FirstClassFare;
+            dto.StartDestination = train.StartDestination;
+            dto.TrainId = train.TrainId;
+            return dto;
+        }
+        private UserDTO ToDTO(User user)
+        {
+            var dto = new UserDTO();
+            dto.Name = user.Name;
+            dto.UserId = user.UserId;
+            dto.TicketHistory = new List<TicketDTO>();
+            foreach (Ticket ticket in user.TicketHistory)
+{
+                dto.TicketHistory.Add(ToDTO(ticket));
+            }
+            return dto;
         }
     }
 }

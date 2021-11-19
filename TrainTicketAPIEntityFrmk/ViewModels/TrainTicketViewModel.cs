@@ -1,11 +1,9 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using TrainTicket.Common;
+using TrainTicket.Common.DTO;
 
 namespace TrainTicketAPIEntityFrmk.ViewModels
 {
@@ -33,14 +31,14 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
             {
                 var readTask = result.Content.ReadAsStringAsync();
                 readTask.Wait();
-                userId = Int32.Parse(readTask.Result);
+                userId = int.Parse(readTask.Result);
                 return userId;
             }
 
             return userId;
         }
 
-        public Ticket GetSelectedUserDetail(int userId)
+        public TicketDTO GetSelectedUserDetail(int userId)
         {
             //latest train history
             var responseTask = _trainticketClient.GetAsync("api/user/getdetails/" + userId);
@@ -48,7 +46,7 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
             var result = responseTask.Result;
             if (result.IsSuccessStatusCode)
             {
-                var readTask = result.Content.ReadAsAsync<Ticket>();
+                var readTask = result.Content.ReadAsAsync<TicketDTO>();
                 readTask.Wait();
                 return readTask.Result;
             }
@@ -57,7 +55,7 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
 
         }
 
-        public IList<Ticket> GetSelectedUserAllDetail(int userId)
+        public IList<TicketDTO> GetSelectedUserAllDetail(int userId)
         {
             //all the train history
             var responseTask = _trainticketClient.GetAsync("api/user/getalldetails/" + userId);
@@ -68,7 +66,7 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
                 var readTask = result.Content.ReadAsStringAsync();
                 readTask.Wait();
                 var stringResult = readTask.Result; //giving me a json string
-                IList<Ticket> convert = JsonConvert.DeserializeObject<IList<Ticket>>(stringResult);
+                IList<TicketDTO> convert = JsonConvert.DeserializeObject<IList<TicketDTO>>(stringResult);
 
                 return convert;
             }
@@ -96,7 +94,7 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
             return false;
         }
 
-        public List<string> GetAllStartStations()
+        public IList<string> GetAllStartStations()
         {
             var responseTask = _trainticketClient.GetAsync("api/train/getstart/");
             responseTask.Wait();
@@ -110,7 +108,7 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
             return null;
         }
 
-        public List<string> GetAllEndStations()
+        public IList<string> GetAllEndStations()
         {
             var responseTask = _trainticketClient.GetAsync("api/train/getend/");
             responseTask.Wait();
@@ -124,34 +122,30 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
             return null;
         }
 
-        public List<Train> GetTrainsBetweenStations(string start, string end)
+        public IList<TrainDTO> GetTrainsBetweenStations(string start, string end)
         {
             var responseTask = _trainticketClient.GetAsync("api/train/getbetween/" + start + "/" + end);
             responseTask.Wait();
             var result = responseTask.Result;
             if (result.IsSuccessStatusCode)
             {
-                var readTask = result.Content.ReadAsAsync<List<Train>>();
+                var readTask = result.Content.ReadAsAsync<List<TrainDTO>>();
                 readTask.Wait();
                 return readTask.Result;
             }
             return null;
         }
 
-        public User BuyTicket(int userId, int numofTickets, TrainClassEnum selectedClass, Train selectedTrain)
+        public void BuyTicket(int userId, int numofTickets, TrainClassEnum selectedClass, TrainDTO selectedTrain)
         {
             var responseTask = _trainticketClient.PostAsJsonAsync("api/ticket/buy/" + userId + "/" + numofTickets + "/" + selectedClass, selectedTrain);      //train class from body??
             responseTask.Wait();
             var result = responseTask.Result;
             if (result.IsSuccessStatusCode)
             {
-                var readTask = result.Content.ReadAsAsync<User>();
+                var readTask = result.Content.ReadAsAsync<UserDTO>();
                 readTask.Wait();
-                return readTask.Result;
             }
-
-            return null;
-
         }
 
         public string GrandTotal(int userId)
@@ -167,41 +161,7 @@ namespace TrainTicketAPIEntityFrmk.ViewModels
                 readTask.Wait();
                 return readTask.Result;
             }
-
             return null;
         }
-
-        #region other functions
-        //public IQueryable<Ticket> DisplayAllTicket()
-        //{
-        //    var responseTask = _trainticketClient.GetAsync("api/ticket");
-        //    responseTask.Wait();
-        //    var result = responseTask.Result;
-        //    if (result.IsSuccessStatusCode)
-        //    {
-        //        var readTask = result.Content.ReadAsAsync<IQueryable<Ticket>>();
-        //        readTask.Wait();
-        //        return readTask.Result;
-
-        //      NEED TO DESERIALIZE JSON
-        //    }
-        //    return null;
-        //}
-
-        //public List<User> GetAllUsers()
-        //{
-        //    var responseTask = _trainticketClient.GetAsync("api/user");
-        //    responseTask.Wait();
-        //    var result = responseTask.Result;
-        //    if (result.IsSuccessStatusCode)
-        //    {
-        //        var readTask = result.Content.ReadAsAsync<List<User>>();
-        //        readTask.Wait();
-        //        return readTask.Result;
-        //    }
-        //    return null;
-
-        //}
-        #endregion
     }
 }

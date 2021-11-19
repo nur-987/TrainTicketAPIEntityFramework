@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TrainTicket.Common;
+using TrainTicket.Common.DTO;
 using TrainTicketAPIEntityFrmk.ViewModels;
 
 namespace TrainTicketAPIEntityFrmk
@@ -30,7 +29,7 @@ namespace TrainTicketAPIEntityFrmk
                 {
                     input1 = Int32.Parse(Console.ReadLine());
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     Console.WriteLine("Wrong Input. Please choose among the available options.");
                     continue;
@@ -38,7 +37,7 @@ namespace TrainTicketAPIEntityFrmk
                 if (input1 == 1) //buy ticket
                 {
                     int userId = 0;
-                    var trainSelected = new Train();
+                    var trainSelected = new TrainDTO();
 
                     bool userFlag = true;
                     while (userFlag)
@@ -60,7 +59,7 @@ namespace TrainTicketAPIEntityFrmk
                             {
                                 userId = Int32.Parse(Console.ReadLine());
                             }
-                            catch (Exception ex)
+                            catch (Exception)
                             {
                                 Console.WriteLine("Wrong input. Please enter a valid user id");
                             }
@@ -85,7 +84,7 @@ namespace TrainTicketAPIEntityFrmk
                     while (startStationFlag)
                     {
                         Console.WriteLine("Please choose your start station.");
-                        List<string> startStationList = trainvm.GetAllStartStations();
+                        IList<string> startStationList = trainvm.GetAllStartStations();
                         foreach (string station in startStationList)
                         {
                             Console.WriteLine(startStationList.IndexOf(station) + 1 + ") " + station);
@@ -96,7 +95,7 @@ namespace TrainTicketAPIEntityFrmk
                             startStation = startStationList[startStationInput - 1];
                             startStationFlag = false;
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
                             Console.WriteLine("Wrong input. Please enter a valid source station");
                             continue;
@@ -107,7 +106,7 @@ namespace TrainTicketAPIEntityFrmk
                     while (endStationFlag)
                     {
                         Console.WriteLine("Please choose your end station.");
-                        List<string> endStationList = trainvm.GetAllEndStations();
+                        IList<string> endStationList = trainvm.GetAllEndStations();
                         foreach (string station in endStationList)
                         {
                             Console.WriteLine(endStationList.IndexOf(station) + 1 + ") " + station);
@@ -118,7 +117,7 @@ namespace TrainTicketAPIEntityFrmk
                             endStation = endStationList[endStationInput - 1];
                             endStationFlag = false;
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
                             Console.WriteLine("Wrong input. Please enter a valid destination station");
                             continue;
@@ -128,7 +127,7 @@ namespace TrainTicketAPIEntityFrmk
                     bool userSelectTrainFlag = true;
                     while (userSelectTrainFlag)
                     {
-                        List<Train> availableTrainRoutesList = trainvm.GetTrainsBetweenStations(startStation, endStation);
+                        IList<TrainDTO> availableTrainRoutesList = trainvm.GetTrainsBetweenStations(startStation, endStation);
                         if (availableTrainRoutesList.Count == 0)
                         {
                             Console.WriteLine("No trains available between the start and end stations");
@@ -137,7 +136,7 @@ namespace TrainTicketAPIEntityFrmk
                         else
                         {
                             Console.WriteLine("Here are the available train timings: ");
-                            foreach (Train item in availableTrainRoutesList)
+                            foreach (TrainDTO item in availableTrainRoutesList)
                             {
                                 Console.WriteLine("Train Id: " + item.TrainId);
                                 Console.Write("Start Destination: " + item.StartDestination + "   ");
@@ -164,7 +163,7 @@ namespace TrainTicketAPIEntityFrmk
                             userSelectTrainFlag = false;
 
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
                             Console.WriteLine("Wrong input. Please choose among the available Train Id.");
                             continue;
@@ -196,7 +195,7 @@ namespace TrainTicketAPIEntityFrmk
                             travelClassSelectionFlag = false;
 
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
                             Console.WriteLine("Wrong input. Please choose among the available travel class and enter the correct number");
                             continue;
@@ -244,7 +243,7 @@ namespace TrainTicketAPIEntityFrmk
                             userId = Int32.Parse(Console.ReadLine());
                             if (trainvm.CheckUserExist(userId))
                             {
-                                IList<Ticket> ticket = trainvm.GetSelectedUserAllDetail(userId);
+                                IList<TicketDTO> ticket = trainvm.GetSelectedUserAllDetail(userId);
                                 foreach (var item in ticket)
                                 {
                                     Console.WriteLine("Ticket ID: " + item.TicketId);
@@ -269,7 +268,7 @@ namespace TrainTicketAPIEntityFrmk
                             }
 
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
                             Console.WriteLine("Wrong input. Please enter correct user id");
                         }

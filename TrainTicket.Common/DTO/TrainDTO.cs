@@ -1,13 +1,9 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace TrainTicket.Common
+namespace TrainTicket.Common.DTO
 {
-    public class Train
+    public class TrainDTO
     {
         public int TrainId { get; set; }
         public string StartDestination { get; set; }

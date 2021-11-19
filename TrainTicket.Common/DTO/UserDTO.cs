@@ -1,19 +1,15 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace TrainTicket.Common
+namespace TrainTicket.Common.DTO
 {
-    public class User
+    public class UserDTO
     {
         public int UserId { get; set; }
         public string Name { get; set; }
 
         [JsonProperty(Required = Required.Default)]
-        public List<Ticket> TicketHistory { get; set; }
+        public List<TicketDTO> TicketHistory { get; set; }
 
     }
 }

@@ -1,14 +1,11 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 using TrainTicket.API.Data;
 using TrainTicket.API.Models;
 using TrainTicket.API.Utility;
+using TrainTicket.Common.DTO;
 
 namespace TrainTicket.API.Controllers
 {
@@ -27,9 +24,14 @@ namespace TrainTicket.API.Controllers
 
         [HttpGet]
         [Route("")]         //checked in postman
-        public IQueryable<Train> DisplayAllTrain()
+        public IEnumerable<TrainDTO> DisplayAllTrain()
         {
-            return dbContext.Trains;
+            IEnumerable<TrainDTO> result = new List<TrainDTO>();
+            foreach(Train train in dbContext.Trains)
+            {
+                result.Append(ToDTO(train));
+            }
+            return result;
         }
 
         /// <summary>
@@ -85,12 +87,15 @@ namespace TrainTicket.API.Controllers
         /// if no result, return empty list
         [HttpGet]
         [Route("getbetween/{start}/{end}")]         //checked in postman
-        public List<Train> GetTrainsBetweenStations(string start, string end)
+        public IEnumerable<TrainDTO> GetTrainsBetweenStations(string start, string end)
         {
-            List<Train> AvailableTrainList = dbContext.Trains.ToList();
-
-            return AvailableTrainList.Where(x => string.Equals(x.EndDestination, end, StringComparison.OrdinalIgnoreCase)
-            && string.Equals(x.StartDestination, start, StringComparison.OrdinalIgnoreCase)).ToList();
+            IEnumerable<TrainDTO> result = new List<TrainDTO>();
+            foreach (Train train in dbContext.Trains.Where(x => string.Equals(x.EndDestination, end, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(x.StartDestination, start, StringComparison.OrdinalIgnoreCase)))
+            {
+                result.Append(ToDTO(train));
+            }
+            return result;
         }
 
         #region Extra functions
@@ -232,6 +237,21 @@ namespace TrainTicket.API.Controllers
         }
 
         #endregion
+
+        private TrainDTO ToDTO(Train train)
+        {
+            var dto = new TrainDTO();
+            dto.ArrivalTime = train.ArrivalTime;
+            dto.BusinessClassFare = train.BusinessClassFare;
+            dto.DepartureTime= train.DepartureTime;
+            dto.Distance = train.Distance;
+            dto.EconomyClassFare   =    train.EconomyClassFare;
+            dto.EndDestination = train.EndDestination;
+            dto.FirstClassFare= train.FirstClassFare;
+            dto.StartDestination = train.StartDestination;
+            dto.TrainId = train.TrainId;
+            return dto;
+        }
 
     }
 }

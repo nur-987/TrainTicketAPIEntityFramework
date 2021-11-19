@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Web;
-using TrainTicket.API.Utility;
+using TrainTicket.Common;
 
 namespace TrainTicket.API.Models
 {

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Web;
+﻿using System.Data.Entity;
 using TrainTicket.API.Models;
 
 namespace TrainTicket.API.Data
@@ -20,8 +16,8 @@ namespace TrainTicket.API.Data
         }
 
         public DbSet<Train> Trains { get; set; }
-        public DbSet<User> User { get; set; }
-        public DbSet<Ticket> Ticket { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Ticket> Tickets { get; set; }
 
     }
 }
