@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrainTicket.Common", "Train
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrainTicket.API", "TrainTicket.WebAPI\TrainTicket.API.csproj", "{F70862C1-4497-4EA4-8C1F-4D49BF626F2E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrainTicket.UnitTest", "TrainTicket.UnitTest\TrainTicket.UnitTest.csproj", "{226DDE97-59DF-4BFB-B1C3-C410CD0BB3AA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{F70862C1-4497-4EA4-8C1F-4D49BF626F2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F70862C1-4497-4EA4-8C1F-4D49BF626F2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F70862C1-4497-4EA4-8C1F-4D49BF626F2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{226DDE97-59DF-4BFB-B1C3-C410CD0BB3AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{226DDE97-59DF-4BFB-B1C3-C410CD0BB3AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{226DDE97-59DF-4BFB-B1C3-C410CD0BB3AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{226DDE97-59DF-4BFB-B1C3-C410CD0BB3AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
