@@ -47,6 +47,10 @@ namespace TrainTicket.API.Controllers
         [ResponseType(typeof(User))]
         public IHttpActionResult AddNewUser(string name)
         {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return BadRequest();
+            }
             User user1 = new User()
             {
                 //ID is auto
@@ -54,10 +58,15 @@ namespace TrainTicket.API.Controllers
                 TicketHistory = new List<Ticket>()
 
             };
-
-            dbContext.User.Add(user1);
-            dbContext.SaveChanges();
-            
+            try
+            {
+                dbContext.User.Add(user1);
+                dbContext.SaveChanges();
+            }
+            catch(Exception ex)
+            {
+                return BadRequest();
+            }
             return Ok(user1.UserId);
 
         }
@@ -69,11 +78,23 @@ namespace TrainTicket.API.Controllers
         /// <returns>user details with complete train history</returns>
         [HttpGet]
         [Route("getdetails/{userId}")]      //checked in postman
-        public Ticket GetSelectedUserDetail(int userId)
+        [ResponseType(typeof(Ticket))]
+        public IHttpActionResult GetSelectedUserDetail(int userId)
         {
-           Ticket ticket = dbContext.Ticket.Include("SelectedTrain").Include("User").Where(t => t.User.UserId == userId)
-                            .OrderByDescending(t => t.BookingTime).FirstOrDefault();
-            return ticket;
+            try
+            {
+                Ticket ticket = dbContext.Ticket.Include("SelectedTrain").Include("User").Where(t => t.User.UserId == userId)
+                 .OrderByDescending(t => t.BookingTime).FirstOrDefault();
+
+                return Ok(ticket);
+
+            }
+            catch
+            {
+                return NotFound();
+            }
+
+            
 
         }
 
