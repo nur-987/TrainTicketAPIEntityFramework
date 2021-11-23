@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.Http.Results;
 using TrainTicket.API.Controllers;
 using TrainTicket.API.Models;
@@ -96,6 +97,22 @@ namespace TrainTicket.UnitTest
             //Assert
             Assert.IsInstanceOfType(ActionResult, typeof(NotFoundResult));
 
+        }
+
+        [TestMethod]
+        public void GetSelectedUserAllDetail()
+        {
+            //arrange
+            var controller = new UserController();
+
+            //act
+            var ActionResult = controller.GetSelectedUserAllDetail(1);
+            var contentResult = ActionResult as OkNegotiatedContentResult<IQueryable<Ticket>>;
+
+            //Assert
+            Assert.IsInstanceOfType(ActionResult, typeof(OkResult));
+            Assert.IsNotNull(contentResult.Content);
+            Assert.AreEqual(XXX, contentResult.Content.Count);
         }
     }
 }

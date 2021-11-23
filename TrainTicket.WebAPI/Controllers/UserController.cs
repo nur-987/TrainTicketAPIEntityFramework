@@ -65,7 +65,7 @@ namespace TrainTicket.API.Controllers
             }
             catch(Exception ex)
             {
-                return BadRequest();
+                return InternalServerError();
             }
             return Ok(user1.UserId);
 
