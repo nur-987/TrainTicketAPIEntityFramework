@@ -12,7 +12,7 @@ namespace TrainTicket.UnitTest
     public class UserControllerTest
     {
         [TestInitialize]
-        public void TestUserInitialise()
+        public void TestUserInitialize()
         {
 
         }
@@ -66,11 +66,11 @@ namespace TrainTicket.UnitTest
 
             //Assert
             Assert.IsInstanceOfType(ActionResult, typeof(BadRequestResult));
-
+            Console.WriteLine("whitespace name, returned bad request");
         }
 
         [TestMethod]
-        public void GetSelectedUserDetail()
+        public void GetSelectedUserDetail_FoundId()
         {
             //arrange
             var controller = new UserController();
@@ -81,8 +81,13 @@ namespace TrainTicket.UnitTest
 
             //Assert
             Assert.IsInstanceOfType(ActionResult, typeof(OkResult));
+            Console.WriteLine("returned Ok Result");
+
             Assert.IsNotNull(contentResult.Content);
+            Console.WriteLine("content is not null");
+
             Assert.AreEqual(XXX, contentResult.Content.TicketId);
+            Console.WriteLine("returned ticket id for the selected user");
         }
 
         [TestMethod]
@@ -96,7 +101,7 @@ namespace TrainTicket.UnitTest
 
             //Assert
             Assert.IsInstanceOfType(ActionResult, typeof(NotFoundResult));
-
+            Console.WriteLine("content not found, returned not found response");
         }
 
         [TestMethod]
@@ -111,8 +116,30 @@ namespace TrainTicket.UnitTest
 
             //Assert
             Assert.IsInstanceOfType(ActionResult, typeof(OkResult));
+            Console.WriteLine("returned Ok Result");
+
             Assert.IsNotNull(contentResult.Content);
+            Console.WriteLine("content is not null");
+
             Assert.AreEqual(XXX, contentResult.Content.Count);
+            Console.WriteLine("returned a count of tickets for the selected user");
+
         }
+
+        [TestMethod]
+        public void CheckUserExist_ReturnTrue()
+        {
+            //arrange
+            var controller = new UserController();
+
+            //act
+            var result = controller.CheckUserExist(1);
+
+            //Assert
+            Assert.IsInstanceOfType(result.GetType(), typeof(bool));
+            Console.WriteLine("returned a boolean type");
+        }
+
     }
+
 }

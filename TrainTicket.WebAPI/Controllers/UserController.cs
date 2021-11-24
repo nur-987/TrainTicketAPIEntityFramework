@@ -123,7 +123,7 @@ namespace TrainTicket.API.Controllers
         public bool CheckUserExist(int userId)
         {
             User user = dbContext.Users.Where(u => u.UserId == userId).FirstOrDefault();
-            if (user!= null)
+            if (user != null)
             {
                 return true;
             }

@@ -50,6 +50,7 @@ namespace TrainTicketAPIEntityFrmk
                             Console.WriteLine("Enter your name: "); //create new user
                             string name = Console.ReadLine();
                             userId = trainvm.AddNewUser(name);
+                            Console.WriteLine("This is your user id: " +userId);
                             userFlag = false;
 
                         }
