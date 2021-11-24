@@ -99,14 +99,15 @@
     <Compile Include="Controllers\TrainController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Data\TrainTicketDataContext.cs" />
+    <Compile Include="Data\TrainTicketDataIntialiser.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Interfaces\IAppConfiguration.cs" />
     <Compile Include="Interfaces\IFileReadWrite.cs" />
-    <Compile Include="Migrations\202111200949404_v2.cs" />
-    <Compile Include="Migrations\202111200949404_v2.designer.cs">
-      <DependentUpon>202111200949404_v2.cs</DependentUpon>
+    <Compile Include="Migrations\202111240133095_seed1.cs" />
+    <Compile Include="Migrations\202111240133095_seed1.designer.cs">
+      <DependentUpon>202111240133095_seed1.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Ticket.cs" />
@@ -130,8 +131,8 @@
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202111200949404_v2.resx">
-      <DependentUpon>202111200949404_v2.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202111240133095_seed1.resx">
+      <DependentUpon>202111240133095_seed1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

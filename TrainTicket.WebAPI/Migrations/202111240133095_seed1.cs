@@ -1,9 +1,9 @@
-﻿namespace TrainTicket.API.Migrations
+﻿namespace TrainTicket.WebAPI.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class v2 : DbMigration
+    public partial class seed1 : DbMigration
     {
         public override void Up()
         {

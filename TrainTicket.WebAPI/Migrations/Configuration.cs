@@ -1,10 +1,11 @@
-﻿namespace TrainTicket.API.Migrations
+﻿namespace TrainTicket.WebAPI.Migrations
 {
     using System;
     using System.Collections.Generic;
     using System.Data.Entity;
     using System.Data.Entity.Migrations;
     using System.Linq;
+    using TrainTicket.API.Data;
     using TrainTicket.API.Models;
     using TrainTicket.API.Utility;
 
@@ -15,9 +16,9 @@
             AutomaticMigrationsEnabled = false;
         }
 
-        protected override void Seed(TrainTicket.API.Data.TrainTicketDataContext context)
+        protected override void Seed(TrainTicketDataContext context)
         {
-            IAppConfiguration _config = new AppConfiguration();
+            AppConfiguration _config = new AppConfiguration();
             _config.Initialize(300, 250, 150, 3.5, 2.5, 1.5);
 
             Train train1 = new Train()
@@ -139,8 +140,8 @@
                 train.EconomyClassFare = _config.EconomyClassBasePrice + train.Distance * _config.EconomyClassDistanceMultiplier;
                 train.FirstClassFare = _config.FirstClassBasePrice + train.Distance * _config.FirstClassDistanceMultiplier;
 
-                context.Trains.Add(train);
             }
+            context.Trains.AddRange(AvailableTrainList);
 
             User user1 = new User()
             {
@@ -170,15 +171,12 @@
 
             };
 
-            context.User.Add(user1);
-            context.Ticket.Add(ticket);
-            context.Ticket.Add(ticket2);
+            context.Users.Add(user1);
+            context.Tickets.Add(ticket);
+            context.Tickets.Add(ticket2);
 
             context.SaveChanges();
-            //  This method will be called after migrating to the latest version.
 
-            //  You can use the DbSet<T>.AddOrUpdate() helper extension method
-            //  to avoid creating duplicate seed data.
         }
     }
 }

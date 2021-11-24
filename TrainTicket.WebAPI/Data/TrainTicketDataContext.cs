@@ -16,12 +16,12 @@ namespace TrainTicket.API.Data
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-
+            base.OnModelCreating(modelBuilder); 
         }
 
         public DbSet<Train> Trains { get; set; }
-        public DbSet<User> User { get; set; }
-        public DbSet<Ticket> Ticket { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Ticket> Tickets { get; set; }
 
     }
 }

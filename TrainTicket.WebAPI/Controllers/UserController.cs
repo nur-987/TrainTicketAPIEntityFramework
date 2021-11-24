@@ -34,7 +34,7 @@ namespace TrainTicket.API.Controllers
         [Route("")]     //checked in postman
         public List<User> GetAllUser()
         {
-            return dbContext.User.ToList();
+            return dbContext.Users.ToList();
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace TrainTicket.API.Controllers
             };
             try
             {
-                dbContext.User.Add(user1);
+                dbContext.Users.Add(user1);
                 dbContext.SaveChanges();
             }
             catch(Exception ex)
@@ -83,7 +83,7 @@ namespace TrainTicket.API.Controllers
         {
             try
             {
-                Ticket ticket = dbContext.Ticket.Include("SelectedTrain").Include("User").Where(t => t.User.UserId == userId)
+                Ticket ticket = dbContext.Tickets.Include("SelectedTrain").Include("User").Where(t => t.User.UserId == userId)
                  .OrderByDescending(t => t.BookingTime).FirstOrDefault();
 
                 return Ok(ticket);
@@ -107,7 +107,7 @@ namespace TrainTicket.API.Controllers
         [Route("getalldetails/{userId}")]       //checked in postman
         public IQueryable<Ticket> GetSelectedUserAllDetail(int userId)
         {
-            IQueryable<Ticket> ListOfticket = dbContext.Ticket.Include("SelectedTrain").Include("User")
+            IQueryable<Ticket> ListOfticket = dbContext.Tickets.Include("SelectedTrain").Include("User")
                                         .Where(t => t.User.UserId == userId);
             return ListOfticket;
 
@@ -122,7 +122,7 @@ namespace TrainTicket.API.Controllers
         [Route("checkexist/{userId}")]          //checked in postman
         public bool CheckUserExist(int userId)
         {
-            User user = dbContext.User.Where(u => u.UserId == userId).FirstOrDefault();
+            User user = dbContext.Users.Where(u => u.UserId == userId).FirstOrDefault();
             if (user!= null)
             {
                 return true;
