@@ -7,21 +7,26 @@ using TrainTicket.API.Models;
 
 namespace TrainTicket.API.Data
 {
-    public class TrainTicketDataContext: DbContext
+    public class TrainTicketDataContext : DbContext, ITrainTicketDataContext
     {
-        public TrainTicketDataContext():base("Name=TrainTicketConnectionString")
+        public TrainTicketDataContext() : base("Name=TrainTicketConnectionString")
         {
             Database.SetInitializer(new CreateDatabaseIfNotExists<TrainTicketDataContext>());
         }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder); 
+            base.OnModelCreating(modelBuilder);
         }
 
-        public DbSet<Train> Trains { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<Ticket> Tickets { get; set; }
+        void ITrainTicketDataContext.SaveChanges()
+        {
+            SaveChanges();
+        }
+
+        public virtual DbSet<Train> Trains { get; set; }
+        public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<Ticket> Tickets { get; set; }
 
     }
 }

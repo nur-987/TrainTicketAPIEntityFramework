@@ -19,11 +19,15 @@ namespace TrainTicket.API.Controllers
     {
         public List<User> userList = new List<User>();
 
-        TrainTicketDataContext dbContext;
+        private readonly ITrainTicketDataContext dbContext;
 
         public UserController()
         {
             dbContext = new TrainTicketDataContext();
+        }
+        public UserController(ITrainTicketDataContext dbcontext)
+        {
+            dbContext = dbcontext;
         }
 
         /// <summary>

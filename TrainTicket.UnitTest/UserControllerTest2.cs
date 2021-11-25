@@ -12,15 +12,15 @@ using TrainTicket.API.Models;
 namespace TrainTicket.UnitTest
 {
     [TestClass]
-    public class UserControllerTest
+    public class UserControllerTest2
     {
-        private readonly UserController userController;
+        //private readonly UserController userController;
         private readonly Mock<ITrainTicketDataContext> dbContextMock = new Mock<ITrainTicketDataContext>();
 
-        public UserControllerTest()
-        {
-            userController = new UserController(dbContextMock.Object);
-        }
+        //public UserControllerTest()
+        //{
+        //    userController = new UserController(dbContextMock.Object);
+        //}
 
         [TestInitialize]
         public void TestUserInitialize()
@@ -67,23 +67,22 @@ namespace TrainTicket.UnitTest
 
             }.AsQueryable();
 
-            var user = new User() { UserId = 1, Name = "BBB", TicketHistory = null };
-
             var mockSet = new Mock<DbSet<User>>();
             mockSet.As<IQueryable<User>>().Setup(m => m.Provider).Returns(userList.Provider);
             mockSet.As<IQueryable<User>>().Setup(m => m.Expression).Returns(userList.Expression);
             mockSet.As<IQueryable<User>>().Setup(m => m.ElementType).Returns(userList.ElementType);
             mockSet.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(userList.GetEnumerator());
 
-            dbContextMock.Setup(x => x.Users.Add(user)).Returns(user);
+            dbContextMock.Setup(x => x.Users).Returns(mockSet.Object);
+            UserController userController = new UserController(dbContextMock.Object);
 
             //act
-            var result = userController.AddNewUser("BBB");
+            var result = userController.AddNewUser("AAA");
             var contentResult = result as OkNegotiatedContentResult<int>;
 
             //Assert
-            Assert.IsNotNull(contentResult);
-            Assert.IsNotNull(contentResult.Content);
+            //Assert.IsNotNull(contentResult);
+            //Assert.IsNotNull(contentResult.Content);
             Assert.IsInstanceOfType(result, typeof(OkNegotiatedContentResult<int>));
             Console.WriteLine("returned Ok Result");
             Assert.AreEqual("1", contentResult.Content);
@@ -95,12 +94,10 @@ namespace TrainTicket.UnitTest
         public void AddNewUser_ReturnsBadRequest()
         {
             //arrange
-            var user = new User() { UserId = 1, Name = " ", TicketHistory = null };
-            dbContextMock.Setup(x => x.Users.Add(user)).Returns(user);
-
+            var controller = new UserController();
 
             //act
-            var ActionResult = userController.AddNewUser(" ");
+            var ActionResult = controller.AddNewUser(" ");
 
             //Assert
             Assert.IsInstanceOfType(ActionResult, typeof(BadRequestResult));
@@ -111,43 +108,20 @@ namespace TrainTicket.UnitTest
         public void GetSelectedUserDetail_FoundId()
         {
             //arrange
-            var ticketList1 = new List<Ticket>
-            {
-                new Ticket{TicketId =1, NumOfTickets = 1, BookingTime = DateTime.Now, SelectedTrain = new Train()},
-                 new Ticket{TicketId =2, NumOfTickets = 1, BookingTime = DateTime.Now, SelectedTrain = new Train()}
-            };
-            var ticketList2 = new List<Ticket>
-            {
-                new Ticket{TicketId =1, NumOfTickets = 1, BookingTime = DateTime.Now, SelectedTrain = new Train()},
-                 new Ticket{TicketId =2, NumOfTickets = 1, BookingTime = DateTime.Now, SelectedTrain = new Train()}
-            };
-
-            var userList = new List<User>
-            {
-                new User{UserId =1, Name= "AAA", TicketHistory = ticketList1 },
-                new User{UserId =2, Name= "BBB", TicketHistory = ticketList2},
-            }.AsQueryable();
-
-            var mockSet = new Mock<DbSet<User>>();
-            mockSet.As<IQueryable<User>>().Setup(m => m.Provider).Returns(userList.Provider);
-            mockSet.As<IQueryable<User>>().Setup(m => m.Expression).Returns(userList.Expression);
-            mockSet.As<IQueryable<User>>().Setup(m => m.ElementType).Returns(userList.ElementType);
-            mockSet.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(userList.GetEnumerator());
-
-            dbContextMock.Setup(x => x.Users).Returns(mockSet.Object);
+            var controller = new UserController();
 
             //act
-            var result = userController.GetSelectedUserDetail(1);
-            var contentResult = result as OkNegotiatedContentResult<Ticket>;
+            var ActionResult = controller.GetSelectedUserDetail(1);
+            var contentResult = ActionResult as OkNegotiatedContentResult<Ticket>;
 
             //Assert
-            Assert.IsInstanceOfType(result, typeof(OkResult));
+            Assert.IsInstanceOfType(ActionResult, typeof(OkResult));
             Console.WriteLine("returned Ok Result");
 
             Assert.IsNotNull(contentResult.Content);
             Console.WriteLine("content is not null");
 
-            Assert.AreEqual(1, contentResult.Content.TicketId);
+            //Assert.AreEqual(XXX, contentResult.Content.TicketId);
             Console.WriteLine("returned ticket id for the selected user");
         }
 
@@ -155,10 +129,10 @@ namespace TrainTicket.UnitTest
         public void GetSelectedUserDetail_NotFoundId()
         {
             //arrange
-            
+            var controller = new UserController();
 
             //act
-            var ActionResult = userController.GetSelectedUserDetail(100);
+            var ActionResult = controller.GetSelectedUserDetail(100);
 
             //Assert
             Assert.IsInstanceOfType(ActionResult, typeof(NotFoundResult));
