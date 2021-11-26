@@ -104,7 +104,6 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Interfaces\IAppConfiguration.cs" />
-    <Compile Include="Interfaces\IFileReadWrite.cs" />
     <Compile Include="Migrations\202111240133095_seed1.cs" />
     <Compile Include="Migrations\202111240133095_seed1.designer.cs">
       <DependentUpon>202111240133095_seed1.cs</DependentUpon>
@@ -115,7 +114,6 @@
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\AppConfiguration.cs" />
-    <Compile Include="Utility\FileManager.cs" />
     <Compile Include="Utility\TrainClassEnum.cs" />
   </ItemGroup>
   <ItemGroup>

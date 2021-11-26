@@ -1,10 +1,13 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TrainTicket.API.Controllers;
+using TrainTicket.API.Data;
 using TrainTicket.API.Models;
 
 namespace TrainTicket.UnitTest
@@ -12,27 +15,41 @@ namespace TrainTicket.UnitTest
     [TestClass]
     public class TrainControllerTest
     {
-        [TestInitialize]
-        public void TestTrainInitialize()
-        {
+        private readonly TrainController trainController;
+        private readonly Mock<ITrainTicketDataContext> dbContextMock = new Mock<ITrainTicketDataContext>();
 
+        public TrainControllerTest()
+        {
+            trainController = new TrainController(dbContextMock.Object);
         }
 
         [TestMethod]
         public void DisplayAllTrain_ReturnListOfTrain()
         {
             //Arrange
-            var controller = new TrainController();
+            var trainList = new List<Train>
+            {
+                new Train {TrainId = 1, StartDestination = "Dublin", EndDestination = "Westport", Distance = 263, 
+                    DepartureTime = new DateTime(2021, 12, 01, 15, 00, 00), ArrivalTime = new DateTime(2021, 12, 01, 19, 00, 00) },
+                new Train {TrainId = 2, StartDestination = "Dublin", EndDestination = "Westport", Distance = 263,
+                    DepartureTime = new DateTime(2021, 12, 01, 15, 00, 00), ArrivalTime = new DateTime(2021, 12, 01, 19, 00, 00) }
+            }.AsQueryable();
+
+
+            var mockSet = new Mock<DbSet<Train>>();
+            mockSet.As<IQueryable<Train>>().Setup(m => m.Provider).Returns(trainList.Provider);
+            mockSet.As<IQueryable<Train>>().Setup(m => m.Expression).Returns(trainList.Expression);
+            mockSet.As<IQueryable<Train>>().Setup(m => m.ElementType).Returns(trainList.ElementType);
+            mockSet.As<IQueryable<Train>>().Setup(m => m.GetEnumerator()).Returns(trainList.GetEnumerator());
+
+            dbContextMock.Setup(x => x.Trains).Returns(mockSet.Object);
 
             //Act
-            var result = controller.DisplayAllTrain();
+            var result = trainController.DisplayAllTrain();
 
             //Assert
-           // Assert.AreEqual(1, result.Count);
+            Assert.AreEqual(2, result.Count());
             Console.WriteLine("return correct number of list");
-
-            Assert.IsInstanceOfType(result.GetType(), typeof(List<Train>));
-            Console.WriteLine("returned list of trains");
 
         }
 
@@ -40,11 +57,25 @@ namespace TrainTicket.UnitTest
         public void GetAllStartStation_ReturnListOfString()
         {
             //Arrange
-            var controller = new TrainController();
+            var trainList = new List<Train>
+            {
+                new Train {TrainId = 1, StartDestination = "AAA", EndDestination = "Westport", Distance = 263,
+                    DepartureTime = new DateTime(2021, 12, 01, 15, 00, 00), ArrivalTime = new DateTime(2021, 12, 01, 19, 00, 00) },
+                new Train {TrainId = 2, StartDestination = "BBB", EndDestination = "Westport", Distance = 263,
+                    DepartureTime = new DateTime(2021, 12, 01, 15, 00, 00), ArrivalTime = new DateTime(2021, 12, 01, 19, 00, 00) }
+            }.AsQueryable();
+
+
+            var mockSet = new Mock<DbSet<Train>>();
+            mockSet.As<IQueryable<Train>>().Setup(m => m.Provider).Returns(trainList.Provider);
+            mockSet.As<IQueryable<Train>>().Setup(m => m.Expression).Returns(trainList.Expression);
+            mockSet.As<IQueryable<Train>>().Setup(m => m.ElementType).Returns(trainList.ElementType);
+            mockSet.As<IQueryable<Train>>().Setup(m => m.GetEnumerator()).Returns(trainList.GetEnumerator());
+
+            dbContextMock.Setup(x => x.Trains).Returns(mockSet.Object);
 
             //Act
-            var result = controller.GetAllStartStations();
-            //var result = actionResult as List<string>;
+            var result = trainController.GetAllStartStations();
 
             //Assert
             Assert.IsNotNull(result);
@@ -53,7 +84,7 @@ namespace TrainTicket.UnitTest
             Assert.IsInstanceOfType(result, typeof(List<string>));
             Console.WriteLine("returned a list");
 
-            //Assert.AreEqual(result.Count, xxx);
+            Assert.AreEqual(2,result.Count());
             Console.WriteLine("returned correct number or items in list");
 
         }
@@ -62,11 +93,25 @@ namespace TrainTicket.UnitTest
         public void GetAllEndStation_ReturnListOfString()
         {
             //Arrange
-            var controller = new TrainController();
+            var trainList = new List<Train>
+            {
+                new Train {TrainId = 1, StartDestination = "AAA", EndDestination = "CCC", Distance = 263,
+                    DepartureTime = new DateTime(2021, 12, 01, 15, 00, 00), ArrivalTime = new DateTime(2021, 12, 01, 19, 00, 00) },
+                new Train {TrainId = 2, StartDestination = "BBB", EndDestination = "DDD", Distance = 263,
+                    DepartureTime = new DateTime(2021, 12, 01, 15, 00, 00), ArrivalTime = new DateTime(2021, 12, 01, 19, 00, 00) }
+            }.AsQueryable();
+
+
+            var mockSet = new Mock<DbSet<Train>>();
+            mockSet.As<IQueryable<Train>>().Setup(m => m.Provider).Returns(trainList.Provider);
+            mockSet.As<IQueryable<Train>>().Setup(m => m.Expression).Returns(trainList.Expression);
+            mockSet.As<IQueryable<Train>>().Setup(m => m.ElementType).Returns(trainList.ElementType);
+            mockSet.As<IQueryable<Train>>().Setup(m => m.GetEnumerator()).Returns(trainList.GetEnumerator());
+
+            dbContextMock.Setup(x => x.Trains).Returns(mockSet.Object);
 
             //Act
-            var result = controller.GetAllEndStations();
-            //var result = actionResult as List<string>;
+            var result = trainController.GetAllEndStations();
 
             //Assert
             Assert.IsNotNull(result);
@@ -75,7 +120,7 @@ namespace TrainTicket.UnitTest
             Assert.IsInstanceOfType(result, typeof(List<string>));
             Console.WriteLine("returned a list");
 
-            //Assert.AreEqual(result.Count, xxx);
+            Assert.AreEqual(2, result.Count());
             Console.WriteLine("returned correct number or items in list");
 
         }
@@ -84,13 +129,28 @@ namespace TrainTicket.UnitTest
         public void GetTrainsBetweenStation_ReturnListOfTrain()
         {
             //Arrange
-            var controller = new TrainController();
-            string start = "xxx";
-            string end = "yyy";
+            var trainList = new List<Train>
+            {
+                new Train {TrainId = 1, StartDestination = "AAA", EndDestination = "CCC", Distance = 263,
+                    DepartureTime = new DateTime(2021, 12, 01, 15, 00, 00), ArrivalTime = new DateTime(2021, 12, 01, 19, 00, 00) },
+                new Train {TrainId = 2, StartDestination = "BBB", EndDestination = "DDD", Distance = 263,
+                    DepartureTime = new DateTime(2021, 12, 01, 15, 00, 00), ArrivalTime = new DateTime(2021, 12, 01, 19, 00, 00) }
+            }.AsQueryable();
+
+
+            var mockSet = new Mock<DbSet<Train>>();
+            mockSet.As<IQueryable<Train>>().Setup(m => m.Provider).Returns(trainList.Provider);
+            mockSet.As<IQueryable<Train>>().Setup(m => m.Expression).Returns(trainList.Expression);
+            mockSet.As<IQueryable<Train>>().Setup(m => m.ElementType).Returns(trainList.ElementType);
+            mockSet.As<IQueryable<Train>>().Setup(m => m.GetEnumerator()).Returns(trainList.GetEnumerator());
+
+            dbContextMock.Setup(x => x.Trains).Returns(mockSet.Object);
+
+            var start = "AAA";
+            var end = "CCC";
 
             //Act
-            var result = controller.GetTrainsBetweenStations(start, end);
-            //var result = actionResult as List<Train>;
+            var result = trainController.GetTrainsBetweenStations(start, end);
 
             //Assert
             Assert.IsNotNull(result);

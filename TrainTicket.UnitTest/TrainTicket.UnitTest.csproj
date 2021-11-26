@@ -83,7 +83,6 @@
   <ItemGroup>
     <Compile Include="DbContextMocker.cs" />
     <Compile Include="TrainControllerTest.cs" />
-    <Compile Include="UserControllerTest2.cs" />
     <Compile Include="UserControllerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -25,6 +25,7 @@ namespace TrainTicket.API.Controllers
         {
             dbContext = new TrainTicketDataContext();
         }
+
         public UserController(ITrainTicketDataContext dbcontext)
         {
             dbContext = dbcontext;
@@ -97,8 +98,6 @@ namespace TrainTicket.API.Controllers
             {
                 return NotFound();
             }
-
-            
 
         }
 

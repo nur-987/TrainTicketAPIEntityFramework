@@ -10,5 +10,6 @@ namespace TrainTicket.API.Data
         DbSet<User> Users { get; set; }
 
         void SaveChanges();
+
     }
 }
