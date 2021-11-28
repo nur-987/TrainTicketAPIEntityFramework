@@ -210,6 +210,7 @@ namespace TrainTicket.UnitTest
         //        new User{UserId =2, Name= "BBB", TicketHistory = ticketList2},
         //    }.AsQueryable();
 
+           
         //    var mockSet = new Mock<DbSet<User>>();
         //    mockSet.As<IQueryable<User>>().Setup(m => m.Provider).Returns(userList.Provider);
         //    mockSet.As<IQueryable<User>>().Setup(m => m.Expression).Returns(userList.Expression);

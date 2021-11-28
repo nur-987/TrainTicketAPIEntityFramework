@@ -81,7 +81,7 @@
     <Reference Include="System.Web.Services" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DbContextMocker.cs" />
+    <Compile Include="TicketControllerTest.cs" />
     <Compile Include="TrainControllerTest.cs" />
     <Compile Include="UserControllerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

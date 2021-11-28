@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Description;
 using TrainTicket.API.Data;
 using TrainTicket.API.Models;
 using TrainTicket.API.Utility;
@@ -14,7 +15,16 @@ namespace TrainTicket.API.Controllers
     [RoutePrefix("api/ticket")]
     public class TicketController : ApiController
     {
-        private TrainTicketDataContext dbContext = new TrainTicketDataContext();
+        private ITrainTicketDataContext dbContext;
+
+        public TicketController()
+        {
+            dbContext = new TrainTicketDataContext();
+        }
+        public TicketController(ITrainTicketDataContext dbcontext)
+        {
+            dbContext = dbcontext;
+        }
 
         [HttpGet]
         [Route("")]         //checked in postman
@@ -25,25 +35,32 @@ namespace TrainTicket.API.Controllers
 
         [HttpPost]
         [Route("buy/{userId}/{numOfTicket}/{selectedClass}")]           //checked in postman
-        public User BuyTicket(int userId, int numOfTicket, TrainClassEnum selectedClass, Train selectedTrain)
+        [ResponseType(typeof(User))]
+        public IHttpActionResult BuyTicket(int userId, int numOfTicket, TrainClassEnum selectedClass, Train selectedTrain)
         {
             User user = dbContext.Users.Find(userId);
             Train train = dbContext.Trains.Find(selectedTrain.TrainId);
 
-            Ticket ticket = new Ticket()
+            if (user != null && train !=null)
             {
-                SelectedTrain = train,
-                SelectedClass = selectedClass,
-                BookingTime = DateTime.Now,
-                NumOfTickets = numOfTicket,
-                User = user,
-                UserId = user.UserId
-            };
+                Ticket ticket = new Ticket()
+                {
+                    SelectedTrain = train,
+                    SelectedClass = selectedClass,
+                    BookingTime = DateTime.Now,
+                    NumOfTickets = numOfTicket,
+                    User = user,
+                    UserId = user.UserId
+                };
 
-            dbContext.Tickets.Add(ticket);
-            dbContext.SaveChanges();
+                dbContext.Tickets.Add(ticket);
+                dbContext.SaveChanges();
 
-            return user;
+                return Ok(user);
+            }
+
+            return InternalServerError();
+
         }
 
 
@@ -78,7 +95,7 @@ namespace TrainTicket.API.Controllers
             finalCost = price * ticketHistory.NumOfTickets;
             ticketHistory.GrandTotal = finalCost;
 
-            dbContext.Entry(ticketHistory).State = System.Data.Entity.EntityState.Modified;
+            //dbContext.Entry(ticketHistory).State = System.Data.Entity.EntityState.Modified;
 
             dbContext.SaveChanges();
 
