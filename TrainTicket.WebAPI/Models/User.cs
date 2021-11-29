@@ -13,6 +13,6 @@ namespace TrainTicket.API.Models
         public string Name { get; set; }
 
         [ForeignKey(nameof(Ticket.TicketId))]
-        public virtual List<Ticket> TicketHistory { get; set; }
+        public List<Ticket> TicketHistory { get; set; }
     }
 }

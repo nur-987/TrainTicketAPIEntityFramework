@@ -99,7 +99,7 @@ namespace TrainTicketAPIEntityFrmk
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine("Wrong input. Please enter a valid source station");
+                            Console.WriteLine("Wrong input. Please enter a valid start station");
                             continue;
                         }
                     }
@@ -121,7 +121,7 @@ namespace TrainTicketAPIEntityFrmk
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine("Wrong input. Please enter a valid destination station");
+                            Console.WriteLine("Wrong input. Please enter a valid end station");
                             continue;
                         }
                     }
@@ -249,6 +249,7 @@ namespace TrainTicketAPIEntityFrmk
                                 foreach (var item in ticket)
                                 {
                                     Console.WriteLine("Ticket ID: " + item.TicketId);
+                                    Console.WriteLine("Booking Time: " +item.BookingTime);
                                     Console.WriteLine("Train ID: " + item.SelectedTrain.TrainId);
                                     Console.WriteLine("Start Station: " + item.SelectedTrain.StartDestination);
                                     Console.WriteLine("End Station: " + item.SelectedTrain.EndDestination);
@@ -256,12 +257,11 @@ namespace TrainTicketAPIEntityFrmk
                                     Console.WriteLine("Arrival Time:  " + item.SelectedTrain.ArrivalTime.ToShortTimeString());
                                     Console.WriteLine("Selected Class: " + item.SelectedClass);
                                     Console.WriteLine("Number of Tickets: " + item.NumOfTickets);
-                                    Console.WriteLine("Grand Total: " + item.GrandTotal);
+                                    Console.WriteLine("Grand Total: $" + item.GrandTotal);
                                     Console.WriteLine("----------------------------");
 
 
                                 }
-                                //print here!!!!
                                 userDetailsFlag = false;
                             }
                             else
